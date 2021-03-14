@@ -1,13 +1,23 @@
 html
     head
-        title= "Self authed - Login"
+        meta(name="viewport" content="width=device-width, initial-scale=1.0")
+        meta(http-equiv="X-UA-Compatible" content="ie=edge")
+        link(rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css"
+                integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous")
+        //link(rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css")
+        title
+            | "SelfAuthed - Login"
+
     body
-        form(action="/login", method="post")
-            div
-                label Username
-                input(type="text", name="username")
-            div
-                label Password
-                input(type="password", name="password")
-            div
-                input(type="submit", value="Log In")
+        div(class='container')
+            form(action="/login", method="post")
+                div(class="form-group")
+                    label(for="login") Username
+                    input(id="login" type="text" class="form-control" name="username"
+                            aria-describedby="login-help" placeholder="Enter login")
+                    small(id="login-help" class="form-text text-muted") Well...
+                div(class="form-group")
+                    label(for="password") Password
+                    input(id="password" type="password" class="form-control" name="password"
+                            placeholder="password")
+                button(type="submit" class="btn btn-primary") Submit
