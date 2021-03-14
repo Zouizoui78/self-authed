@@ -3,6 +3,7 @@ process.chdir(__dirname)
 const fs = require('fs');
 const crypto = require("crypto");
 const express = require('express');
+var session = require("express-session");
 
 const app = express()
 const server = require('http').createServer(app);
@@ -11,7 +12,6 @@ var bodyParser = require("body-parser");
 
 var passport = require('passport')
 var LocalStrategy = require('passport-local').Strategy;
-var session = require("express-session");
 
 const port = 3002;
 
@@ -39,6 +39,30 @@ passport.use(new LocalStrategy(function(username, password, done)
     return done(null, users[username]);
 }));
 
+
+// https://stackoverflow.com/a/27637668
+passport.serializeUser(function(user, done)
+{
+    var id = crypto.randomBytes(100).toString('hex');
+    user.id = id;
+    done(null, user.id);
+});
+
+passport.deserializeUser(function(obj, done)
+{
+    console.log("prout");
+    console.log(obj);
+    for (let i = 0; i < users.length; i++)
+    {
+        const element = users[i];
+        if (obj == element["id"])
+        {
+            done(null, element);
+        }
+    }
+    done(null, false);
+});
+
 // Middlewares
 app.use(express.static("public"));
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -49,25 +73,28 @@ app.use(passport.session());
 // Rendering engine
 app.set('view engine', 'pug');
 
-app.post("/login",
-    passport.authenticate("local", {
-        successRedirect: "/",
-        failureRedirect: "/login"
-    })
-);
-
-app.get("/login", (req, res) => {
-    res.render('login');
-});
+app.post("/login", passport.authenticate("local", {
+    successRedirect: "/",
+    failureRedirect: "/"
+}));
 
 app.get("/", (req, res) => {
-    res.render('index');
+    //console.log(req.session);
+    console.log(users);
+    if (isCookieValid(req, res))
+        res.send(200);
+    else
+        res.render('login');
 });
 
 server.listen(port, () => {
     console.log(`App listening on port ${port}`)
 });
 
+function isCookieValid(req, res)
+{
+    return false;
+}
 
 function validPassword(username, passwordCandidate)
 {
@@ -102,6 +129,7 @@ function loadUserFile(path)
             if (split.length == 3)
             {
                 ret[split[0]] = {
+                    username: split[0],
                     password: split[1],
                     permissions: split[2]
                 }
