@@ -24,11 +24,11 @@ function getUserId(id)
     {
         if (users.hasOwnProperty(key))
         {
-            var element = users[key];
-            if (id == element["id"])
-                return element;
-        }
+        var element = users[key];
+        if (id == element["id"])
+            return element;
     }
+}
     return null;
 }
 
@@ -38,8 +38,7 @@ function getUserFromCookie(req)
     {
         // Contains current auth session id
         var userId = req.session.passport.user;
-        var element = getUserId(userId);
-        return element;
+        return getUserId(userId);
     }
     return null;
 }
@@ -51,8 +50,8 @@ function checkPermissions(user, service)
     {
         if (permissions == "all")
             return true;
-        var lst = permissions.split(',');
-        for (var perm in lst)
+        var list = permissions.split(',');
+        for (var perm in list)
         {
             if (perm == service)
                 return true;
@@ -77,9 +76,7 @@ function validateSession(req)
         {
             console.log("Require usage of service: " + service);
             if (checkPermissions(user, service))
-            {
                 return true;
-            }
             else
                 console.error("User does not have permissions for service " + service);
         }
@@ -144,6 +141,8 @@ app.use(passport.session());
 // Rendering engine
 app.set('view engine', 'pug');
 
+/* ************************************************************************* */
+/* Routes */
 app.post("/login", passport.authenticate("local", {
     successRedirect: "/",
     failureRedirect: "/"
@@ -160,7 +159,7 @@ app.get("/logout", function(req, res)
 
 app.get("/", (req, res) => {
     if (validateSession(req))
-        res.send(200);
+        res.end();
     else
         res.render('login');
 });
@@ -176,7 +175,7 @@ function validPassword(username, passwordCandidate)
         .digest("hex");
     if (users[username]["password"] == hash)
     {
-        console.log("Authenticated : " + username);
+        console.log("Valid password for : " + username);
         return true;
     }
     else
