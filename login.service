@@ -1,0 +1,10 @@
+[Unit]
+Description=Login server
+
+[Service]
+UMask=0002
+User=node
+ExecStart=/usr/bin/node /opt/auth/index.js
+
+[Install]
+WantedBy=multi-user.target
