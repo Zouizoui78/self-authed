@@ -9,43 +9,17 @@ const app = express()
 const server = require('http').createServer(app);
 
 var bodyParser = require("body-parser");
+var cookieParser = require("cookie-parser");
 
-var passport = require('passport')
-var LocalStrategy = require('passport-local').Strategy;
-
-const port = 24080;
+const port = 3002;
 
 /* ************************************************************************* */
 /* Session validation */
 
-function getUserId(id)
-{
-    for (var key in users)
-    {
-        if (users.hasOwnProperty(key))
-        {
-            var element = users[key];
-            if (id == element["id"])
-                return element;
-        }
-    }
-    return null;
-}
-
-function getUserFromCookie(req)
-{
-    if (req.session.passport)
-    {
-        // Contains current auth session id
-        var userId = req.session.passport.user;
-        return getUserId(userId);
-    }
-    return null;
-}
-
 function checkPermissions(user, service)
 {
-    var permissions = user["permissions"];
+    var permissions = user.permissions;
+    console.log(user.username + " has permission to access " + user.permissions);
     if (permissions)
     {
         if (permissions == "all")
@@ -60,6 +34,11 @@ function checkPermissions(user, service)
     return false;
 }
 
+function generateToken()
+{
+    return crypto.randomBytes(100).toString('hex');
+}
+
 function getServiceFromRequest(req)
 {
     return "all";
@@ -67,16 +46,20 @@ function getServiceFromRequest(req)
 
 function validateSession(req)
 {
-    var user = getUserFromCookie(req);
-    if (user != null)
+    if(req.cookies != undefined)
+        var user = tokens[req.cookies.token];
+    if (user != undefined)
     {
-        console.log("User logged in: " + user['username']);
+        console.log("Found session for : " + user.username);
         var service = getServiceFromRequest(req);
         if (service != null)
         {
-            console.log("Require usage of service: " + service);
+            console.log(user.username + " requires usage of service: " + service);
             if (checkPermissions(user, service))
+            {
+                console.log("Permision OK : " + user.username + " logged in");
                 return true;
+            }
             else
                 console.error("User does not have permissions for service " + service);
         }
@@ -111,7 +94,7 @@ function loadUserFile(path)
             }
             else
             {
-                console.log("Failed to parser user line : " + line);
+                console.log("Failed to parse user line : " + line);
             }
         }
     }
@@ -119,7 +102,7 @@ function loadUserFile(path)
 }
 
 /* ************************************************************************* */
-/* Users */
+/* Users and tokens */
 
 let users = loadUserFile("./passwords");
 if (users == null)
@@ -128,25 +111,34 @@ if (users == null)
 console.log("Found users:");
 console.log(users);
 
+tokens = {};
+
 /* ************************************************************************* */
 /* App */
 
 // Middlewares
+app.use(bodyParser.urlencoded({ extended: false })); // Forms request body parsing
+app.use(bodyParser.json());
+app.use(cookieParser());
 app.use(express.static("public"));
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(session({ secret: "ureghoelg" }));
-app.use(passport.initialize());
-app.use(passport.session());
 
 // Rendering engine
 app.set('view engine', 'pug');
 
 /* ************************************************************************* */
 /* Routes */
-app.post("/login", passport.authenticate("local", {
-    successRedirect: "/",
-    failureRedirect: "/"
-}));
+app.post("/login", (req, res) => {
+    let { username, password } = req.body;
+    if(validateCredentials(username, password))
+    {
+        const token = generateToken();
+        tokens[token] = users[username];
+        res.cookie('token', token);
+        res.redirect('/');
+    }
+    else
+        res.redirect('/login');
+});
 
 app.get("/logout", function(req, res)
 {
@@ -157,30 +149,37 @@ app.get("/logout", function(req, res)
     })
 });
 
+app.get("/login", (req, res) => {
+    res.render('login');
+});
+
 app.get("/", (req, res) => {
     if (validateSession(req))
         res.end();
     else
-        res.render('login');
-});
-
-app.get("/validate", (req, res) => {
-    if (validateSession(req))
-        res.send(200);
-    else
-        res.send(401);
+        res.sendStatus(401);
 });
 
 /* ************************************************************************* */
 /* Passport secure login */
 
-function validPassword(username, passwordCandidate)
+function hashPassword(password)
 {
-    let hash = crypto
+    return crypto
         .createHash("sha256")
-        .update(passwordCandidate)
+        .update(password)
         .digest("hex");
-    if (users[username]["password"] == hash)
+}
+
+function validateCredentials(username, passwordCandidate)
+{
+    let hashed = hashPassword(passwordCandidate);
+    if(users[username] == undefined)
+    {
+        console.log("Unknown user " + username);
+        return false;
+    }
+    if (users[username]["password"] == hashed)
     {
         console.log("Valid password for : " + username);
         return true;
@@ -191,38 +190,6 @@ function validPassword(username, passwordCandidate)
         return false;
     }
 }
-
-passport.use(new LocalStrategy(function(username, password, done)
-{
-    console.log("Starting authentication of " + username);
-    if (users[username] == undefined)
-    {
-        console.log("Unknown user : " + username);
-        return done(null, false, { message: 'Incorrect username.' });
-    }
-    if (!validPassword(username, password))
-    {
-        return done(null, false, { message: 'Incorrect password.' });
-    }
-    return done(null, users[username]);
-}));
-
-
-// https://stackoverflow.com/a/27637668
-passport.serializeUser(function(user, done)
-{
-    var id = crypto.randomBytes(100).toString('hex');
-    user.id = id;
-    return done(null, user.id);
-});
-
-passport.deserializeUser(function(id, done)
-{
-    var element = getUserId(id);
-    if (element)
-        return done(null, element);
-    return done(null, false);
-});
 
 /* ************************************************************************* */
 /* Start */
