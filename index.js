@@ -24,11 +24,11 @@ function getUserId(id)
     {
         if (users.hasOwnProperty(key))
         {
-        var element = users[key];
-        if (id == element["id"])
-            return element;
+            var element = users[key];
+            if (id == element["id"])
+                return element;
+        }
     }
-}
     return null;
 }
 
