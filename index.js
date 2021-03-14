@@ -13,7 +13,7 @@ var bodyParser = require("body-parser");
 var passport = require('passport')
 var LocalStrategy = require('passport-local').Strategy;
 
-const port = 3002;
+const port = 24080;
 
 /* ************************************************************************* */
 /* Session validation */
@@ -163,6 +163,13 @@ app.get("/", (req, res) => {
         res.send(200);
     else
         res.render('login');
+});
+
+app.get("/validate", (req, res) => {
+    if (validateSession(req))
+        res.send(200);
+    else
+        res.send(401);
 });
 
 /* ************************************************************************* */
