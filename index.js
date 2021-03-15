@@ -78,7 +78,7 @@ function loadUserFile(path)
 
 console.log("Loading user file...");
 
-let users = loadUserFile("./passwords");
+let users = loadUserFile(configuration.passwords);
 if (users == null)
     return 1;
 
