@@ -82,8 +82,11 @@ let users = loadUserFile("./passwords");
 if (users == null)
     return 1;
 
-console.log("Found users:");
-console.log(users);
+if (configuration.debug)
+{
+    console.log("Found users:");
+    console.log(users);
+}
 
 /* ************************************************************************* */
 /* Session validation */
@@ -91,7 +94,8 @@ console.log(users);
 function checkPermissions(user, service)
 {
     var permissions = user.permissions;
-    console.log("Permissions for user: '" + user.username + "' -> " + user.permissions);
+    if (configuration.debug)
+        console.log("Permissions for user: '" + user.username + "' -> " + user.permissions);
     if (permissions)
     {
         if (permissions == "all")
@@ -124,7 +128,7 @@ function getDomainFromUrl(url)
     return url;
 }
 
-function getSubdomainFromUrl(url)
+function getSubdomainFromDomain(url)
 {
     var split = url.split('.');
     if (split.length > 0)
@@ -143,9 +147,10 @@ function getServiceFromRequest(req)
         console.error("Origin unknown: '" + origin + "' try adding Origin in http headers");
         return null;
     }
-    console.log("Origin URL: " + url);
+    if (configuration.debug)
+        console.log("Origin URL: " + url);
     if (service_method == "subdomain")
-        return getSubdomainFromUrl(url);
+        return getSubdomainFromDomain(url);
     else if (service_method == "list")
     {
         if (configuration.services)
@@ -159,14 +164,17 @@ function validateSession(req)
     var user = req.session != undefined ? users[req.session.user] : undefined;
     if (user != undefined)
     {
-        console.log("Found session for: " + user.username);
+        if (configuration.debug)
+            console.log("Found session for: " + user.username);
         var service = getServiceFromRequest(req);
         if (service != undefined && service != null)
         {
-            console.log("User '" + user.username + "' wants to use service: " + service);
+            if (configuration.debug)
+                console.log("User '" + user.username + "' wants to use service: " + service);
             if (checkPermissions(user, service))
             {
-                console.log("Permission accorded for: " + user.username);
+                if (configuration.debug)
+                    console.log("Permission accorded for: " + user.username);
                 return true;
             }
             else
@@ -175,7 +183,8 @@ function validateSession(req)
         else
             console.error("Could not find service in request");
     }
-    console.log("No valid session found");
+    if (configuration.debug)
+        console.log("No valid session found");
     return false;
 }
 
@@ -216,7 +225,8 @@ app.post("/login", (req, res) => {
 
 app.get("/logout", function(req, res)
 {
-    console.log("-> Log out");
+    if (configuration.debug)
+        console.log("-> Log out");
     req.session.destroy(function(err)
     {
         res.redirect('/login');
@@ -224,13 +234,17 @@ app.get("/logout", function(req, res)
 });
 
 app.get("/login", (req, res) => {
-    console.log("-> Log in");
-    console.log(req.headers);
+    if (configuration.debug)
+    {
+        console.log("-> Log in");
+        console.log(req.headers);
+    }
     res.render('login');
 });
 
 app.get("/auth", (req, res) => {
-    console.log("-> Authentication");
+    if (configuration.debug)
+        console.log("-> Authentication");
     if (validateSession(req))
         res.sendStatus(200);
     else
@@ -253,17 +267,18 @@ function validateCredentials(username, passwordCandidate)
     let hashed = hashPassword(passwordCandidate);
     if(users[username] == undefined)
     {
-        console.log("Unknown user: " + username);
+        console.error("Unknown user: " + username);
         return false;
     }
     if (users[username]["password"] == hashed)
     {
-        console.log("Valid password for: " + username);
+        if (configuration.debug)
+            console.log("Valid password for: " + username);
         return true;
     }
     else
     {
-        console.log("Wrong password for: " + username);
+        console.error("Wrong password for: " + username);
         return false;
     }
 }
