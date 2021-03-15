@@ -8,7 +8,7 @@ const app = express()
 const server = require('http').createServer(app);
 
 var bodyParser = require("body-parser");
-var cookieParser = require("cookie-parser");
+const session = require('express-session');
 
 const port = 3002;
 
@@ -33,9 +33,9 @@ function checkPermissions(user, service)
     return false;
 }
 
-function generateToken()
+function generateToken(length)
 {
-    return crypto.randomBytes(100).toString('hex');
+    return crypto.randomBytes(length).toString('hex');
 }
 
 function getServiceFromRequest(req)
@@ -45,9 +45,9 @@ function getServiceFromRequest(req)
 
 function validateSession(req)
 {
-    if(req.cookies != undefined)
+    if(req.session != undefined)
     {
-        var user = tokens[req.cookies.token];
+        var user = users[req.session.user];
     }
     if (user != undefined)
     {
@@ -113,16 +113,20 @@ if (users == null)
 console.log("Found users:");
 console.log(users);
 
-tokens = {};
-
 /* ************************************************************************* */
 /* App */
-
 // Middlewares
 app.use(bodyParser.urlencoded({ extended: false })); // Forms request body parsing
 app.use(bodyParser.json());
-app.use(cookieParser());
-app.use(express.static("public"));
+
+// With this middleware enabled everything stored in req.session in saved across requests
+app.use(session({
+    secret: generateToken(20),
+    secure: true, // Require https
+    proxy: true, // Trust reverse proxy
+    saveUninitialized: false, // true -> deprecated
+    resave: false // true -> deprecated
+}))
 
 // Rendering engine
 app.set('view engine', 'pug');
@@ -133,9 +137,7 @@ app.post("/login", (req, res) => {
     let { username, password } = req.body;
     if(validateCredentials(username, password))
     {
-        const token = generateToken();
-        tokens[token] = users[username];
-        res.cookie('token', token);
+        req.session.user = username;
         res.redirect('/');
     }
     else
@@ -157,7 +159,7 @@ app.get("/login", (req, res) => {
 
 app.get("/auth", (req, res) => {
     if (validateSession(req))
-        res.end();
+        res.sendStatus(200);
     else
         res.sendStatus(401);
 });
