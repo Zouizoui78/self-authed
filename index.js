@@ -47,17 +47,19 @@ function getServiceFromRequest(req)
 function validateSession(req)
 {
     if(req.cookies != undefined)
+    {
         var user = tokens[req.cookies.token];
+    }
     if (user != undefined)
     {
         console.log("Found session for : " + user.username);
         var service = getServiceFromRequest(req);
         if (service != null)
         {
-            console.log(user.username + " requires usage of service: " + service);
+            console.log(user.username + " requests usage of service: " + service);
             if (checkPermissions(user, service))
             {
-                console.log("Permision OK : " + user.username + " logged in");
+                console.log("Permision OK : " + user.username + " authenticated");
                 return true;
             }
             else
@@ -66,6 +68,7 @@ function validateSession(req)
         else
             console.error("Could not find service in request");
     }
+    console.log("No valid session found");
     return false;
 }
 
@@ -153,7 +156,7 @@ app.get("/login", (req, res) => {
     res.render('login');
 });
 
-app.get("/", (req, res) => {
+app.get("/auth", (req, res) => {
     if (validateSession(req))
         res.end();
     else
