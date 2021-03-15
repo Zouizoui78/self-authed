@@ -4,7 +4,7 @@ Description=Login server
 [Service]
 UMask=0002
 User=node
-ExecStart=/usr/bin/node /opt/auth/index.js
+ExecStart=/usr/bin/node /opt/self-authed/index.js
 
 [Install]
 WantedBy=multi-user.target
