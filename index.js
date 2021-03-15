@@ -3,7 +3,6 @@ process.chdir(__dirname)
 const fs = require('fs');
 const crypto = require("crypto");
 const express = require('express');
-var session = require("express-session");
 
 const app = express()
 const server = require('http').createServer(app);
