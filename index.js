@@ -125,7 +125,8 @@ app.use(session({
     secure: true, // Require https
     proxy: true, // Trust reverse proxy
     saveUninitialized: false, // true -> deprecated
-    resave: false // true -> deprecated
+    resave: false, // true -> deprecated
+    cookie: { maxAge: 31 * 24 * 3600 * 1000 } // Cookie validity in milliseconds
 }))
 
 // Rendering engine
