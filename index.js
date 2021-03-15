@@ -10,7 +10,7 @@ const server = require('http').createServer(app);
 var bodyParser = require("body-parser");
 const session = require('express-session');
 
-const port = 3002;
+const port = 24080;
 
 /* ************************************************************************* */
 /* Session validation */
@@ -38,22 +38,43 @@ function generateToken(length)
     return crypto.randomBytes(length).toString('hex');
 }
 
+function getSubdomainFromUrl(url)
+{
+    if (!url)
+    {
+        console.error("Origin unknown: '" + url + "' try adding Origin in http headers");
+        return null;
+    }
+    var split = url.split('.');
+    if (!split || !split[0])
+    {
+        console.error("Origin unknown: '" + url + "' try adding Origin in http headers");
+        return null;
+    }
+    var regex = /:\/\/([^\/]+)/.exec(split[0]);
+    if (regex == null)
+        return split[0];
+    console.log('regex', regex);
+    var subdomain = regex[1];
+    return subdomain;
+}
+
 function getServiceFromRequest(req)
 {
-    return "all";
+    let origin = req.headers.origin;
+    if (origin == undefined)
+        origin = req.headers.referer;
+    return getSubdomainFromUrl(origin);
 }
 
 function validateSession(req)
 {
-    if(req.session != undefined)
-    {
-        var user = users[req.session.user];
-    }
+    var user = req.session != undefined ? users[req.session.user] : undefined;
     if (user != undefined)
     {
         console.log("Found session for : " + user.username);
         var service = getServiceFromRequest(req);
-        if (service != null)
+        if (service != undefined && service != null)
         {
             console.log(user.username + " requests usage of service: " + service);
             if (checkPermissions(user, service))
@@ -134,9 +155,11 @@ app.set('view engine', 'pug');
 
 /* ************************************************************************* */
 /* Routes */
+
 app.post("/login", (req, res) => {
-    let { username, password } = req.body;
-    if(validateCredentials(username, password))
+    let username = req.body.username;
+    let password = req.body.password;
+    if (validateCredentials(username, password))
     {
         req.session.user = username;
         res.redirect('/');
@@ -147,18 +170,21 @@ app.post("/login", (req, res) => {
 
 app.get("/logout", function(req, res)
 {
-    console.log("Login out");
+    console.log("Log out");
     req.session.destroy(function(err)
     {
-        res.redirect('/');
+        res.redirect('/login');
     })
 });
 
 app.get("/login", (req, res) => {
+    console.log("Log in");
+    console.log(req.headers);
     res.render('login');
 });
 
 app.get("/auth", (req, res) => {
+    console.log("Authentication");
     if (validateSession(req))
         res.sendStatus(200);
     else
@@ -201,5 +227,5 @@ function validateCredentials(username, passwordCandidate)
 
 console.log("Starting app");
 server.listen(port, () => {
-    console.log(`App listening on port ${port}`)
+    console.log(`App listening on port ${port}`);
 });
