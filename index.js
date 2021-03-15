@@ -114,6 +114,8 @@ function generateToken(length)
 // http://www.primaryobjects.com/2012/11/19/parsing-hostname-and-domain-from-a-url-with-javascript/
 function getDomainFromUrl(url)
 {
+    if (!url)
+        return "";
     var match = url.match(/:\/\/(www[0-9]?\.)?(.[^/:]+)/i);
     if (match != null && match.length > 2 && typeof match[2] === 'string' && match[2].length > 0)
     {
@@ -124,10 +126,10 @@ function getDomainFromUrl(url)
 
 function getSubdomainFromUrl(url)
 {
-    var regex = /:\/\/([^\/]+)/.exec(url);
-    if (regex == null)
-        return "";
-    return regex[1];
+    var split = url.split('.');
+    if (split.length > 0)
+        return split[0];
+    return null;
 }
 
 function getServiceFromRequest(req)
@@ -214,7 +216,7 @@ app.post("/login", (req, res) => {
 
 app.get("/logout", function(req, res)
 {
-    console.log("Log out");
+    console.log("-> Log out");
     req.session.destroy(function(err)
     {
         res.redirect('/login');
@@ -222,13 +224,13 @@ app.get("/logout", function(req, res)
 });
 
 app.get("/login", (req, res) => {
-    console.log("Log in");
+    console.log("-> Log in");
     console.log(req.headers);
     res.render('login');
 });
 
 app.get("/auth", (req, res) => {
-    console.log("Authentication");
+    console.log("-> Authentication");
     if (validateSession(req))
         res.sendStatus(200);
     else
