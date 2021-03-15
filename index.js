@@ -10,87 +10,39 @@ const server = require('http').createServer(app);
 var bodyParser = require("body-parser");
 const session = require('express-session');
 
-const port = 24080;
+/* ************************************************************************* */
+/* Configuration */
+
+function readConfigurationFile(path)
+{
+    try
+    {
+        let rawdata = fs.readFileSync(path);
+        return JSON.parse(rawdata);
+    }
+    catch(err)
+    {
+        console.error(err.message);
+        return {};
+    }
+}
+
+console.log("Loading configuration...");
+
+let configuration = readConfigurationFile('./conf.json');
+
+const port = configuration.port == undefined ? 3002 : configuration.port;
+const service_method = configuration.service_method == undefined ? "subdomain" : configuration.service_method;
+
+console.log("Service retrieval from: " + service_method);
+if (service_method == "list" && !configuration.services)
+{
+    console.error("No service list configured !");
+    return 1;
+}
 
 /* ************************************************************************* */
-/* Session validation */
-
-function checkPermissions(user, service)
-{
-    var permissions = user.permissions;
-    console.log(user.username + " has permission to access " + user.permissions);
-    if (permissions)
-    {
-        if (permissions == "all")
-            return true;
-        var list = permissions.split(',');
-        for (var perm in list)
-        {
-            if (perm == service)
-                return true;
-        }
-    }
-    return false;
-}
-
-function generateToken(length)
-{
-    return crypto.randomBytes(length).toString('hex');
-}
-
-function getSubdomainFromUrl(url)
-{
-    if (!url)
-    {
-        console.error("Origin unknown: '" + url + "' try adding Origin in http headers");
-        return null;
-    }
-    var split = url.split('.');
-    if (!split || !split[0])
-    {
-        console.error("Origin unknown: '" + url + "' try adding Origin in http headers");
-        return null;
-    }
-    var regex = /:\/\/([^\/]+)/.exec(split[0]);
-    if (regex == null)
-        return split[0];
-    console.log('regex', regex);
-    var subdomain = regex[1];
-    return subdomain;
-}
-
-function getServiceFromRequest(req)
-{
-    let origin = req.headers.origin;
-    if (origin == undefined)
-        origin = req.headers.referer;
-    return getSubdomainFromUrl(origin);
-}
-
-function validateSession(req)
-{
-    var user = req.session != undefined ? users[req.session.user] : undefined;
-    if (user != undefined)
-    {
-        console.log("Found session for : " + user.username);
-        var service = getServiceFromRequest(req);
-        if (service != undefined && service != null)
-        {
-            console.log(user.username + " requests usage of service: " + service);
-            if (checkPermissions(user, service))
-            {
-                console.log("Permision OK : " + user.username + " authenticated");
-                return true;
-            }
-            else
-                console.error("User does not have permissions for service " + service);
-        }
-        else
-            console.error("Could not find service in request");
-    }
-    console.log("No valid session found");
-    return false;
-}
+/* Users and tokens */
 
 function loadUserFile(path)
 {
@@ -117,15 +69,14 @@ function loadUserFile(path)
             }
             else
             {
-                console.log("Failed to parse user line : " + line);
+                console.log("Failed to parse user line: " + line);
             }
         }
     }
     return ret;
 }
 
-/* ************************************************************************* */
-/* Users and tokens */
+console.log("Loading user file...");
 
 let users = loadUserFile("./passwords");
 if (users == null)
@@ -135,7 +86,100 @@ console.log("Found users:");
 console.log(users);
 
 /* ************************************************************************* */
+/* Session validation */
+
+function checkPermissions(user, service)
+{
+    var permissions = user.permissions;
+    console.log("Permissions for user: '" + user.username + "' -> " + user.permissions);
+    if (permissions)
+    {
+        if (permissions == "all")
+            return true;
+        var list = permissions.split(',');
+        for (var perm in list)
+        {
+            if (perm == service)
+                return true;
+        }
+    }
+    return false;
+}
+
+function generateToken(length)
+{
+    return crypto.randomBytes(length).toString('hex');
+}
+
+// http://www.primaryobjects.com/2012/11/19/parsing-hostname-and-domain-from-a-url-with-javascript/
+function getDomainFromUrl(url)
+{
+    var match = url.match(/:\/\/(www[0-9]?\.)?(.[^/:]+)/i);
+    if (match != null && match.length > 2 && typeof match[2] === 'string' && match[2].length > 0)
+    {
+        return match[2];
+    }
+    return url;
+}
+
+function getSubdomainFromUrl(url)
+{
+    var regex = /:\/\/([^\/]+)/.exec(url);
+    if (regex == null)
+        return "";
+    return regex[1];
+}
+
+function getServiceFromRequest(req)
+{
+    let origin = req.headers.origin;
+    if (origin == undefined)
+        origin = req.headers.referer;
+    let url = getDomainFromUrl(origin);
+    if (!origin || !url)
+    {
+        console.error("Origin unknown: '" + origin + "' try adding Origin in http headers");
+        return null;
+    }
+    console.log("Origin URL: " + url);
+    if (service_method == "subdomain")
+        return getSubdomainFromUrl(url);
+    else if (service_method == "list")
+    {
+        if (configuration.services)
+            return configuration.services[url];
+        console.error("No service list configured !");
+    }
+}
+
+function validateSession(req)
+{
+    var user = req.session != undefined ? users[req.session.user] : undefined;
+    if (user != undefined)
+    {
+        console.log("Found session for: " + user.username);
+        var service = getServiceFromRequest(req);
+        if (service != undefined && service != null)
+        {
+            console.log("User '" + user.username + "' wants to use service: " + service);
+            if (checkPermissions(user, service))
+            {
+                console.log("Permission accorded for: " + user.username);
+                return true;
+            }
+            else
+                console.error("User does not have permissions for service: " + service);
+        }
+        else
+            console.error("Could not find service in request");
+    }
+    console.log("No valid session found");
+    return false;
+}
+
+/* ************************************************************************* */
 /* App */
+
 // Middlewares
 app.use(bodyParser.urlencoded({ extended: false })); // Forms request body parsing
 app.use(bodyParser.json());
@@ -207,17 +251,17 @@ function validateCredentials(username, passwordCandidate)
     let hashed = hashPassword(passwordCandidate);
     if(users[username] == undefined)
     {
-        console.log("Unknown user " + username);
+        console.log("Unknown user: " + username);
         return false;
     }
     if (users[username]["password"] == hashed)
     {
-        console.log("Valid password for : " + username);
+        console.log("Valid password for: " + username);
         return true;
     }
     else
     {
-        console.log("Wrong password for " + username);
+        console.log("Wrong password for: " + username);
         return false;
     }
 }
@@ -225,7 +269,7 @@ function validateCredentials(username, passwordCandidate)
 /* ************************************************************************* */
 /* Start */
 
-console.log("Starting app");
+console.log("Starting app...");
 server.listen(port, () => {
-    console.log(`App listening on port ${port}`);
+    console.log(`App listening on port: ${port}`);
 });

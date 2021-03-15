@@ -1,0 +1,7 @@
+{
+    "port": 24080,
+    "service_method": "subdomain",
+    "services": {
+        "subdomain.domain.com": "service"
+    }
+}
