@@ -64,7 +64,7 @@ function loadUserFile(path)
                 ret[split[0]] = {
                     username: split[0],
                     password: split[1],
-                    permissions: split[2]
+                    permissions: split[2].split(',')
                 }
             }
             else
@@ -100,11 +100,9 @@ function checkPermissions(user, service)
     {
         if (permissions == "all")
             return true;
-        var list = permissions.split(',');
-        for (var perm in list)
+        if (permissions.includes(service))
         {
-            if (perm == service)
-                return true;
+            return true;
         }
     }
     return false;
@@ -178,7 +176,7 @@ function validateSession(req)
                 return true;
             }
             else
-                console.error("User does not have permissions for service: " + service);
+                console.error(user.username + " does not have permissions for service: " + service);
         }
         else
             console.error("Could not find service in request");
