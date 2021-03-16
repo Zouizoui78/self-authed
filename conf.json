@@ -2,6 +2,7 @@
     "debug": false,
     "port": 24080,
     "passwords": "./passwords",
+    "cookie_domain": ".domain.com",
     "service_method": "subdomain",
     "services": {
         "subdomain.domain.com": "service"

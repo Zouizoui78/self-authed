@@ -9,6 +9,7 @@ const server = require('http').createServer(app);
 
 var bodyParser = require("body-parser");
 const session = require('express-session');
+const { exit } = require('process');
 
 /* ************************************************************************* */
 /* Configuration */
@@ -31,8 +32,14 @@ console.log("Loading configuration...");
 
 let configuration = readConfigurationFile('./conf.json');
 
-const port = configuration.port == undefined ? 3002 : configuration.port;
+const port = configuration.port == undefined ? 24080 : configuration.port;
 const service_method = configuration.service_method == undefined ? "subdomain" : configuration.service_method;
+const cookie_domain = configuration.cookie_domain;
+if(cookie_domain == undefined)
+{
+    console.error("Required setting 'cookie_domain' not found in configuration.");
+    exit(1);
+}
 
 console.log("Service retrieval from: " + service_method);
 if (service_method == "list" && !configuration.services)
@@ -101,9 +108,7 @@ function checkPermissions(user, service)
         if (permissions == "all")
             return true;
         if (permissions.includes(service))
-        {
             return true;
-        }
     }
     return false;
 }
@@ -196,11 +201,13 @@ app.use(bodyParser.json());
 // With this middleware enabled everything stored in req.session in saved across requests
 app.use(session({
     secret: generateToken(20),
-    secure: true, // Require https
     saveUninitialized: false, // true -> deprecated
     resave: false, // true -> deprecated
-    cookie: { maxAge: 31 * 24 * 3600 * 1000 } // Cookie validity in milliseconds
-}))
+    cookie: {
+        maxAge: 31 * 24 * 3600 * 1000, // Cookie validity in milliseconds
+        domain: cookie_domain,
+    }
+}));
 
 // Rendering engine
 app.set('view engine', 'pug');
@@ -209,12 +216,20 @@ app.set('view engine', 'pug');
 /* Routes */
 
 app.post("/login", (req, res) => {
+    if (configuration.debug)
+    {
+        console.log("-> Log in post");
+        console.log(req.session);
+    }
+
     let username = req.body.username;
     let password = req.body.password;
+    let url = req.session.url;
+
     if (validateCredentials(username, password))
     {
         req.session.user = username;
-        res.redirect('/');
+        res.redirect(url);
     }
     else
         res.redirect('/login');
@@ -233,15 +248,19 @@ app.get("/logout", function(req, res)
 app.get("/login", (req, res) => {
     if (configuration.debug)
     {
-        console.log("-> Log in");
-        console.log(req.headers);
+        console.log("-> Log in get");
+        console.log(req.session);
     }
-    res.render('login');
+    req.session.url = req.query.url;
+    res.render("login");
 });
 
 app.get("/auth", (req, res) => {
     if (configuration.debug)
+    {
         console.log("-> Authentication");
+        console.log(req.session);
+    }
     if (validateSession(req))
         res.sendStatus(200);
     else
