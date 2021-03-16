@@ -193,19 +193,13 @@ function validateSession(req)
 app.use(bodyParser.urlencoded({ extended: false })); // Forms request body parsing
 app.use(bodyParser.json());
 
-var cookieConfig = {
-    secret: generateToken(20),
-    secure: true,
-    maxAge: 31 * 24 * 3600 * 1000
-}
 // With this middleware enabled everything stored in req.session in saved across requests
 app.use(session({
-    secret: cookieConfig.secret,
-    secure: cookieConfig.secure, // Require https
-    proxy: true, // Trust reverse proxy
+    secret: generateToken(20),
+    secure: true, // Require https
     saveUninitialized: false, // true -> deprecated
     resave: false, // true -> deprecated
-    cookie: { maxAge: cookieConfig.maxAge } // Cookie validity in milliseconds
+    cookie: { maxAge: 31 * 24 * 3600 * 1000 } // Cookie validity in milliseconds
 }))
 
 // Rendering engine
