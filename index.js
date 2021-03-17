@@ -166,7 +166,7 @@ function getUserSession(req)
 
 function validateSession(req)
 {
-    var user = req.session != undefined ? users[req.session.user] : undefined;
+    var user = getUserSession(req);
     if (user != undefined)
     {
         if (configuration.debug)
