@@ -159,6 +159,11 @@ function getServiceFromRequest(req)
     }
 }
 
+function getUserSession(req)
+{
+    return req.session != undefined ? users[req.session.user] : undefined;
+}
+
 function validateSession(req)
 {
     var user = req.session != undefined ? users[req.session.user] : undefined;
@@ -270,10 +275,14 @@ app.get("/auth", (req, res) => {
 });
 
 app.get("/", (req, res) => {
-    if (validateSession(req))
-        res.send("ok");
-    else
+    var user = getUserSession(req);
+    if (user == undefined)
         res.redirect("/login");
+    else
+        res.render('home', {
+            username: user.username,
+            services: user.permissions
+        })
 });
 
 /* ************************************************************************* */
