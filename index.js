@@ -68,9 +68,7 @@ function loadUserFile(path)
                 }
             }
             else
-            {
                 console.log("Failed to parse user line: " + line);
-            }
         }
     }
     return ret;
@@ -265,7 +263,7 @@ function hashPassword(password)
 function validateCredentials(username, passwordCandidate)
 {
     let hashed = hashPassword(passwordCandidate);
-    if(users[username] == undefined)
+    if (users[username] == undefined)
     {
         console.error("Unknown user: " + username);
         return false;
