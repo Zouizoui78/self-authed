@@ -31,8 +31,14 @@ console.log("Loading configuration...");
 
 let configuration = readConfigurationFile('./conf.json');
 
-const port = configuration.port == undefined ? 3002 : configuration.port;
+const port = configuration.port == undefined ? 24080 : configuration.port;
 const service_method = configuration.service_method == undefined ? "subdomain" : configuration.service_method;
+const cookie_domain = configuration.cookie_domain;
+if(cookie_domain == undefined)
+{
+    console.error("Required setting 'cookie_domain' not found in configuration.");
+    return 1;
+}
 
 console.log("Service retrieval from: " + service_method);
 if (service_method == "list" && !configuration.services)
@@ -64,7 +70,7 @@ function loadUserFile(path)
                 ret[split[0]] = {
                     username: split[0],
                     password: split[1],
-                    permissions: split[2]
+                    permissions: split[2].split(',')
                 }
             }
             else
@@ -76,7 +82,7 @@ function loadUserFile(path)
 
 console.log("Loading user file...");
 
-let users = loadUserFile("./passwords");
+let users = loadUserFile(configuration.passwords);
 if (users == null)
     return 1;
 
@@ -98,12 +104,8 @@ function checkPermissions(user, service)
     {
         if (permissions == "all")
             return true;
-        var list = permissions.split(',');
-        for (var perm in list)
-        {
-            if (perm == service)
-                return true;
-        }
+        if (permissions.includes(service))
+            return true;
     }
     return false;
 }
@@ -176,7 +178,7 @@ function validateSession(req)
                 return true;
             }
             else
-                console.error("User does not have permissions for service: " + service);
+                console.error(user.username + " does not have permissions for service: " + service);
         }
         else
             console.error("Could not find service in request");
@@ -191,20 +193,22 @@ function validateSession(req)
 
 // Middlewares
 app.use(bodyParser.urlencoded({ extended: false })); // Forms request body parsing
-app.use(bodyParser.json());
 
-// With this middleware enabled everything stored in req.session in saved across requests
+// With this middleware enabled everything stored in req.session is saved across requests
 app.use(session({
+    name: "session",
     secret: generateToken(20),
-    secure: true, // Require https
-    proxy: true, // Trust reverse proxy
     saveUninitialized: false, // true -> deprecated
     resave: false, // true -> deprecated
-    cookie: { maxAge: 31 * 24 * 3600 * 1000 } // Cookie validity in milliseconds
-}))
+    cookie: {
+        maxAge: 31 * 24 * 3600 * 1000, // Cookie validity in milliseconds
+        domain: cookie_domain,
+        httpOnly: true,
+    }
+}));
 
 // Rendering engine
-app.set('view engine', 'pug');
+app.set("view engine", "pug");
 
 /* ************************************************************************* */
 /* Routes */
@@ -212,13 +216,25 @@ app.set('view engine', 'pug');
 app.post("/login", (req, res) => {
     let username = req.body.username;
     let password = req.body.password;
+    let url = req.session.url;
+
+    if (configuration.debug)
+    {
+        console.log("-> Log in post");
+        console.log(req.session);
+        console.log("url = " + url)
+    }
+
     if (validateCredentials(username, password))
     {
         req.session.user = username;
-        res.redirect('/');
+        if(url == undefined)
+            res.redirect('/');
+        else
+            res.redirect(url);
     }
     else
-        res.redirect('/login');
+        res.redirect("/login");
 });
 
 app.get("/logout", function(req, res)
@@ -227,26 +243,37 @@ app.get("/logout", function(req, res)
         console.log("-> Log out");
     req.session.destroy(function(err)
     {
-        res.redirect('/login');
+        res.redirect("/login");
     })
 });
 
 app.get("/login", (req, res) => {
     if (configuration.debug)
     {
-        console.log("-> Log in");
-        console.log(req.headers);
+        console.log("-> Log in get");
+        console.log(req.session);
     }
-    res.render('login');
+    req.session.url = req.query.url;
+    res.render("login");
 });
 
 app.get("/auth", (req, res) => {
     if (configuration.debug)
+    {
         console.log("-> Authentication");
+        console.log(req.session);
+    }
     if (validateSession(req))
         res.sendStatus(200);
     else
         res.sendStatus(401);
+});
+
+app.get("/", (req, res) => {
+    if (validateSession(req))
+        res.send("ok");
+    else
+        res.redirect("/login");
 });
 
 /* ************************************************************************* */
