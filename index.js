@@ -9,7 +9,6 @@ const server = require('http').createServer(app);
 
 var bodyParser = require("body-parser");
 const session = require('express-session');
-const { exit } = require('process');
 
 /* ************************************************************************* */
 /* Configuration */
@@ -38,7 +37,7 @@ const cookie_domain = configuration.cookie_domain;
 if(cookie_domain == undefined)
 {
     console.error("Required setting 'cookie_domain' not found in configuration.");
-    exit(1);
+    return 1;
 }
 
 console.log("Service retrieval from: " + service_method);
@@ -196,43 +195,48 @@ function validateSession(req)
 
 // Middlewares
 app.use(bodyParser.urlencoded({ extended: false })); // Forms request body parsing
-app.use(bodyParser.json());
 
-// With this middleware enabled everything stored in req.session in saved across requests
+// With this middleware enabled everything stored in req.session is saved across requests
 app.use(session({
+    name: "session",
     secret: generateToken(20),
     saveUninitialized: false, // true -> deprecated
     resave: false, // true -> deprecated
     cookie: {
         maxAge: 31 * 24 * 3600 * 1000, // Cookie validity in milliseconds
         domain: cookie_domain,
+        httpOnly: true,
     }
 }));
 
 // Rendering engine
-app.set('view engine', 'pug');
+app.set("view engine", "pug");
 
 /* ************************************************************************* */
 /* Routes */
 
 app.post("/login", (req, res) => {
-    if (configuration.debug)
-    {
-        console.log("-> Log in post");
-        console.log(req.session);
-    }
-
     let username = req.body.username;
     let password = req.body.password;
     let url = req.session.url;
 
+    if (configuration.debug)
+    {
+        console.log("-> Log in post");
+        console.log(req.session);
+        console.log("url = " + url)
+    }
+
     if (validateCredentials(username, password))
     {
         req.session.user = username;
-        res.redirect(url);
+        if(url == undefined)
+            res.redirect('/');
+        else
+            res.redirect(url);
     }
     else
-        res.redirect('/login');
+        res.redirect("/login");
 });
 
 app.get("/logout", function(req, res)
@@ -241,7 +245,7 @@ app.get("/logout", function(req, res)
         console.log("-> Log out");
     req.session.destroy(function(err)
     {
-        res.redirect('/login');
+        res.redirect("/login");
     })
 });
 
@@ -265,6 +269,13 @@ app.get("/auth", (req, res) => {
         res.sendStatus(200);
     else
         res.sendStatus(401);
+});
+
+app.get("/", (req, res) => {
+    if (validateSession(req))
+        res.send("ok");
+    else
+        res.redirect("/login");
 });
 
 /* ************************************************************************* */
