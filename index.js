@@ -156,7 +156,7 @@ function getUserSession(req)
 
 function validateSession(req)
 {
-    var user = req.session != undefined ? users[req.session.user] : undefined;
+    var user = getUserSession(req);
     if (user != undefined)
     {
         if (configuration.debug)
@@ -223,6 +223,7 @@ app.post("/login", (req, res) => {
     if (validateCredentials(username, password))
     {
         req.session.user = username;
+        delete req.session.url;
         if(url == undefined)
             res.redirect('/');
         else
@@ -248,7 +249,8 @@ app.get("/login", (req, res) => {
         console.log("-> Log in get");
         console.log(req.session);
     }
-    req.session.url = req.query.url;
+    if(req.session.url == undefined)
+        req.session.url = req.query.url;
     res.render("login");
 });
 
