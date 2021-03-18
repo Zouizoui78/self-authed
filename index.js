@@ -13,7 +13,7 @@ const session = require('express-session');
 /* ************************************************************************* */
 /* Configuration */
 
-function readConfigurationFile(path)
+function readJson(path)
 {
     try
     {
@@ -23,13 +23,15 @@ function readConfigurationFile(path)
     catch(err)
     {
         console.error(err.message);
-        return {};
+        return null;
     }
 }
 
 console.log("Loading configuration...");
 
-let configuration = readConfigurationFile('./conf.json');
+let configuration = readJson('./conf.json');
+if (configuration == null)
+    return 1;
 
 const port = configuration.port == undefined ? 24080 : configuration.port;
 const service_method = configuration.service_method == undefined ? "subdomain" : configuration.service_method;
@@ -52,30 +54,19 @@ if (service_method == "list" && !configuration.services)
 
 function loadUserFile(path)
 {
-    let users;
-    users = fs.readFileSync(path, {encoding: "utf8"}).split('\n');
-    if (users == "")
-    {
-        console.log("Cannot open user file path: " + path);
+    let json = readJson(path);
+    if (json == null)
         return null;
-    }
-    ret = {};
-    for (line of users)
+    let ret = {};
+    for (var i = 0; i < json.length; ++i)
     {
-        if (line != "")
-        {
-            split = line.split(':');
-            if (split.length == 3)
-            {
-                ret[split[0]] = {
-                    username: split[0],
-                    password: split[1],
-                    permissions: split[2].split(',')
-                }
-            }
-            else
-                console.log("Failed to parse user line: " + line);
-        }
+        let user = json[i];
+        ret[user.username] = {
+            username: user.username,
+            password: user.password,
+            permissions: user.permissions,
+            admin: user.admin
+        };
     }
     return ret;
 }
@@ -85,7 +76,6 @@ console.log("Loading user file...");
 let users = loadUserFile(configuration.passwords);
 if (users == null)
     return 1;
-
 if (configuration.debug)
 {
     console.log("Found users:");
@@ -102,7 +92,7 @@ function checkPermissions(user, service)
         console.log("Permissions for user: '" + user.username + "' -> " + user.permissions);
     if (permissions)
     {
-        if (permissions == "all")
+        if (permissions.includes("all"))
             return true;
         if (permissions.includes(service))
             return true;
@@ -281,7 +271,26 @@ app.get("/", (req, res) => {
     else
         res.render('home', {
             username: user.username,
+            admin: user.admin,
             services: user.permissions
+        })
+});
+
+function isAdmin(user)
+{
+    if (!user)
+        return false;
+    return user.admin == true;
+}
+
+app.get("/admin", (req, res) => {
+    var user = getUserSession(req);
+    if (user == undefined || !isAdmin(user))
+        res.redirect("/login");
+    else
+        res.render('admin', {
+            username: user.username,
+            users: users
         })
 });
 
