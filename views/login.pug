@@ -8,17 +8,22 @@ html
         title SelfAuthed
 
     body
-        div(class='container')
-            div(class="p-3 mb-2 bg-primary text-white text-center")
-                h1 Self-Authed
-        div(class='container')
-            form(action="/login", method="post")
-                div(class="mb-3")
-                    label(for="login" class="form-label") Username
-                    input(id="login" type="text" class="form-control" name="username"
-                            aria-describedby="login-help" placeholder="Enter login")
-                div(class="mb-3")
-                    label(for="password" class="form-label") Password
-                    input(id="password" type="password" class="form-control" name="password"
-                            placeholder="Enter password")
-                button(type="submit" class="btn btn-primary") Log in
+        div(class="row" style="margin-top: 20px")
+            div(class="col-lg-3 col-md-2")
+            div(class="col-lg-6 col-md-8")
+                div(class='container')
+                    div(class="card")
+                        div(class="card-header bg-primary text-white text-center")
+                            h2 Self-Authed
+                        div(class="card-body")
+                            div(class='container')
+                                form(action="/login", method="post")
+                                    div(class="mb-3")
+                                        label(for="login" class="form-label") Username
+                                        input(id="login" type="text" class="form-control" name="username"
+                                                aria-describedby="login-help" placeholder="Enter login")
+                                    div(class="mb-3")
+                                        label(for="password" class="form-label") Password
+                                        input(id="password" type="password" class="form-control" name="password"
+                                                placeholder="Enter password")
+                                    button(type="submit" class="btn btn-primary") Log in
