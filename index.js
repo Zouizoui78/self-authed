@@ -205,6 +205,9 @@ app.use(session({
 // Rendering engine
 app.set("view engine", "pug");
 
+// Serve static files
+app.use(express.static('public'));
+
 /* ************************************************************************* */
 /* Routes */
 
