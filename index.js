@@ -290,17 +290,17 @@ app.get("/", (req, res) => {
 /* ************************************************************************* */
 /* Passport secure login */
 
-function hashPassword(password)
+function hash(toHash)
 {
     return crypto
         .createHash("sha256")
-        .update(password)
+        .update(toHash)
         .digest("hex");
 }
 
 function validateCredentials(username, passwordCandidate)
 {
-    let hashed = hashPassword(passwordCandidate);
+    let hashed = hash(passwordCandidate);
     if (users[username] == undefined)
     {
         console.error("Unknown user: " + username);
