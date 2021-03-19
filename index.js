@@ -1,8 +1,10 @@
 process.chdir(__dirname)
 
 const fs = require('fs');
-const crypto = require("crypto");
 const express = require('express');
+
+const sa_auth = require("./private/js/auth.js");
+const sa_session = require("./private/js/session.js");
 
 const app = express()
 const server = require('http').createServer(app);
@@ -82,106 +84,9 @@ if (configuration.debug)
     console.log(users);
 }
 
-/* ************************************************************************* */
-/* Session validation */
-
-function checkPermissions(user, service)
-{
-    var permissions = user.permissions;
-    if (configuration.debug)
-        console.log("Permissions for user: '" + user.username + "' -> " + user.permissions);
-    if (permissions)
-    {
-        if (permissions.includes("all"))
-            return true;
-        if (permissions.includes(service))
-            return true;
-    }
-    return false;
-}
-
-function generateToken(length)
-{
-    return crypto.randomBytes(length).toString('hex');
-}
-
-// http://www.primaryobjects.com/2012/11/19/parsing-hostname-and-domain-from-a-url-with-javascript/
-function getDomainFromUrl(url)
-{
-    if (!url)
-        return "";
-    var match = url.match(/:\/\/(www[0-9]?\.)?(.[^/:]+)/i);
-    if (match != null && match.length > 2 && typeof match[2] === 'string' && match[2].length > 0)
-    {
-        return match[2];
-    }
-    return url;
-}
-
-function getSubdomainFromDomain(url)
-{
-    var split = url.split('.');
-    if (split.length > 0)
-        return split[0];
-    return null;
-}
-
-function getServiceFromRequest(req)
-{
-    let origin = req.headers.origin;
-    if (origin == undefined)
-        origin = req.headers.referer;
-    let url = getDomainFromUrl(origin);
-    if (!origin || !url)
-    {
-        console.error("Origin unknown: '" + origin + "' try adding Origin in http headers");
-        return null;
-    }
-    if (configuration.debug)
-        console.log("Origin URL: " + url);
-    if (service_method == "subdomain")
-        return getSubdomainFromDomain(url);
-    else if (service_method == "list")
-    {
-        if (configuration.services)
-            return configuration.services[url];
-        console.error("No service list configured !");
-    }
-}
-
-function getUserSession(req)
-{
-    return req.session != undefined ? users[req.session.user] : undefined;
-}
-
-function validateSession(req)
-{
-    var user = getUserSession(req);
-    if (user != undefined)
-    {
-        if (configuration.debug)
-            console.log("Found session for: " + user.username);
-        var service = getServiceFromRequest(req);
-        if (service != undefined && service != null)
-        {
-            if (configuration.debug)
-                console.log("User '" + user.username + "' wants to use service: " + service);
-            if (checkPermissions(user, service))
-            {
-                if (configuration.debug)
-                    console.log("Permission accorded for: " + user.username);
-                return true;
-            }
-            else
-                console.error(user.username + " does not have permissions for service: " + service);
-        }
-        else
-            console.error("Could not find service in request");
-    }
-    if (configuration.debug)
-        console.log("No valid session found");
-    return false;
-}
+sa_session.setUsers(users);
+sa_session.setConf(configuration);
+sa_auth.setConf(configuration);
 
 /* ************************************************************************* */
 /* App */
@@ -192,7 +97,7 @@ app.use(bodyParser.urlencoded({ extended: false })); // Forms request body parsi
 // With this middleware enabled everything stored in req.session is saved across requests
 app.use(session({
     name: "session",
-    secret: generateToken(20),
+    secret: sa_auth.generateToken(20),
     saveUninitialized: false, // true -> deprecated
     resave: false, // true -> deprecated
     cookie: {
@@ -223,7 +128,7 @@ app.post("/login", (req, res) => {
         console.log("url = " + url)
     }
 
-    if (validateCredentials(username, password))
+    if (sa_auth.validateCredentials(users, username, password))
     {
         req.session.user = username;
         delete req.session.url;
@@ -263,14 +168,14 @@ app.get("/auth", (req, res) => {
         console.log("-> Authentication");
         console.log(req.session);
     }
-    if (validateSession(req))
+    if (sa_session.validateSession(req))
         res.sendStatus(200);
     else
         res.sendStatus(401);
 });
 
 app.get("/", (req, res) => {
-    var user = getUserSession(req);
+    var user = sa_session.getUserSession(req);
     if (user == undefined)
         res.redirect("/login");
     else
@@ -289,7 +194,7 @@ function isAdmin(user)
 }
 
 app.get("/admin", (req, res) => {
-    var user = getUserSession(req);
+    var user = sa_session.getUserSession(req);
     if (user == undefined || !isAdmin(user))
         res.redirect("/login");
     else
@@ -298,38 +203,6 @@ app.get("/admin", (req, res) => {
             users: users
         })
 });
-
-/* ************************************************************************* */
-/* Passport secure login */
-
-function hash(toHash)
-{
-    return crypto
-        .createHash("sha256")
-        .update(toHash)
-        .digest("hex");
-}
-
-function validateCredentials(username, passwordCandidate)
-{
-    let hashed = hash(passwordCandidate);
-    if (users[username] == undefined)
-    {
-        console.error("Unknown user: " + username);
-        return false;
-    }
-    if (users[username]["password"] == hashed)
-    {
-        if (configuration.debug)
-            console.log("Valid password for: " + username);
-        return true;
-    }
-    else
-    {
-        console.error("Wrong password for: " + username);
-        return false;
-    }
-}
 
 /* ************************************************************************* */
 /* Start */
