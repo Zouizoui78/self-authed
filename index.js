@@ -35,8 +35,12 @@ let configuration = readJson('./conf.json');
 if (configuration == null)
     return 1;
 
-const port = configuration.port == undefined ? 24080 : configuration.port;
-const service_method = configuration.service_method == undefined ? "subdomain" : configuration.service_method;
+if (configuration.port == undefined)
+    configuration.port = 24080;
+
+if (configuration.service_method == undefined)
+    configuration.service_method = "subdomain"
+
 const cookie_domain = configuration.cookie_domain;
 if(cookie_domain == undefined)
 {
@@ -44,8 +48,8 @@ if(cookie_domain == undefined)
     return 1;
 }
 
-console.log("Service retrieval from: " + service_method);
-if (service_method == "list" && !configuration.services)
+console.log("Service retrieval from: " + configuration.service_method);
+if (configuration.service_method == "list" && !configuration.services)
 {
     console.error("No service list configured !");
     return 1;
@@ -208,6 +212,6 @@ app.get("/admin", (req, res) => {
 /* Start */
 
 console.log("Starting app...");
-server.listen(port, () => {
-    console.log(`App listening on port: ${port}`);
+server.listen(configuration.port, () => {
+    console.log(`App listening on port: ${configuration.port}`);
 });
