@@ -1,4 +1,4 @@
 document.addEventListener("DOMContentLoaded", function(event)
 {
-    console.log("Admin loaded");
+    console.log("Home loaded");
 });

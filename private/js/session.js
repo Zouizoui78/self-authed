@@ -63,9 +63,9 @@ function getServiceFromRequest(req)
     }
     if (_configuration.debug)
         console.log("Origin URL: " + url);
-    if (service_method == "subdomain")
+    if (_configuration.service_method == "subdomain")
         return getSubdomainFromDomain(url);
-    else if (service_method == "list")
+    else if (_configuration.service_method == "list")
     {
         if (_configuration.services)
             return _configuration.services[url];
