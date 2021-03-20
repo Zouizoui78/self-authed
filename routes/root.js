@@ -1,13 +1,6 @@
 var express = require('express'),
     router = express();
 
-function isAdmin(user)
-{
-    if (!user)
-        return false;
-    return user.admin == true;
-}
-
 module.exports = function(configuration, users)
 {
     const sa_session = require("../private/js/session.js")
@@ -105,7 +98,7 @@ module.exports = function(configuration, users)
 
     router.get("/admin", (req, res) => {
         var user = sa_session.getUserSession(req);
-        if (user == undefined || !isAdmin(user))
+        if (user == undefined || !sa_session.isAdmin(user))
             res.redirect("/login");
         else
             res.render('admin', {

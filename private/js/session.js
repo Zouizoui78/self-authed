@@ -103,8 +103,16 @@ function validateSession(req)
     return false;
 }
 
+function isAdmin(user)
+{
+    if (!user)
+        return false;
+    return user.admin == true;
+}
+
 module.exports = {
     "validateSession": validateSession,
     "getUserSession": getUserSession,
+    "isAdmin": isAdmin,
     "init": init,
 }
