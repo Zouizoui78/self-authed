@@ -3,14 +3,12 @@ process.chdir(__dirname)
 const fs = require('fs');
 const express = require('express');
 
-const sa_auth = require("./private/js/auth.js");
-const sa_session = require("./private/js/session.js");
-
 const app = express()
 const server = require('http').createServer(app);
 
 var bodyParser = require("body-parser");
 const session = require('express-session');
+const { config } = require('process');
 
 /* ************************************************************************* */
 /* Configuration */
@@ -88,9 +86,8 @@ if (configuration.debug)
     console.log(users);
 }
 
-sa_session.setUsers(users);
-sa_session.setConf(configuration);
-sa_auth.setConf(configuration);
+const sa_auth = require("./private/js/auth.js")
+sa_auth.init(configuration);
 
 /* ************************************************************************* */
 /* App */

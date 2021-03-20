@@ -1,8 +1,8 @@
 let _configuration = null;
 
-function setConf(conf)
+function init(configuration)
 {
-    _configuration = conf;
+    _configuration = configuration;
 }
 
 const _crypto = require("crypto");
@@ -42,8 +42,8 @@ function validateCredentials(users, username, passwordCandidate)
 }
 
 module.exports = {
+    "init": init,
     "generateToken": generateToken,
     "hash": hash,
     "validateCredentials": validateCredentials,
-    "setConf": setConf,
 }

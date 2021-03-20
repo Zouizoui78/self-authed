@@ -43,13 +43,16 @@ ajax.send = function (url, method, data, onSuccess, onError, onEnd, async)
                 console.log(x.statusText);
                 console.log(x.getAllResponseHeaders());
                 console.log(x.responseURL);
-                onSuccess(x.responseText);
+                if (onSuccess)
+                    onSuccess(x.responseText, x);
             }
             else if (x.status >= 400)
             {
-                onError(x.responseText);
+                if (onError)
+                    onError(x.responseText, x);
             }
-            onEnd();
+            if (onEnd)
+                onEnd(x);
         }
     };
     if (method == 'POST')

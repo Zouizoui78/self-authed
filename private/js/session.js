@@ -4,13 +4,9 @@
 let _users = null;
 let _configuration = null;
 
-function setConf(conf)
+function init(configuration, users)
 {
-    _configuration = conf;
-}
-
-function setUsers(users)
-{
+    _configuration = configuration;
     _users = users;
 }
 
@@ -110,6 +106,5 @@ function validateSession(req)
 module.exports = {
     "validateSession": validateSession,
     "getUserSession": getUserSession,
-    "setConf": setConf,
-    "setUsers": setUsers,
+    "init": init,
 }

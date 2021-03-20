@@ -26,6 +26,4 @@ block content
                         h2 Permissions
                     div(class="card-body")
                         div(class='container')
-                            ul(class="list-group list-group-flush")
-                                for service in services
-                                    li(class="list-group-item list-group-item-action")= service
+                            ul(id="permissions" class="list-group list-group-flush")
