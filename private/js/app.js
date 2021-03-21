@@ -61,6 +61,7 @@ module.exports = {
     get_users: get_users,
     get_user: get_user,
     get_config: get_config,
+    write_users: write_users,
     write_config: write_config,
     api: _api,
     auth: _auth,

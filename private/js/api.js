@@ -10,11 +10,6 @@ function _check_is_string(data)
     return typeof(data) == "string";
 }
 
-function _check_is_obj(data)
-{
-    return typeof(data) == 'object';
-}
-
 function _check_is_array(data)
 {
     return Array.isArray(data);
@@ -38,6 +33,7 @@ function change_password(username, password)
         var ret = verif_password(password);
         if (ret.good == true)
             user.password = _app.auth.hash(password);
+        _app.write_users();
         return ret;
     }
     return _app.tools.result(false, "No such user: " + username);
@@ -57,6 +53,7 @@ function add_user(username, password)
                 password: _app.auth.hash(password),
                 permissions: [],
             }
+            _app.write_users();
         }
         return ret;
     }
@@ -70,6 +67,7 @@ function remove_user(username)
     if (user)
     {
         delete users[username];
+        _app.write_users();
         return _app.tools.result(true);
     }
     return _app.tools.result(false, "User does not exist: " + username);
@@ -86,6 +84,7 @@ function add_service(name, url)
         return _app.tools.result(false, "Cannot have a service named 'all'");
     config.services[name] = url;
     config._url_to_services[url] = name;
+    _app.write_config();
     return _app.tools.result(true);
 }
 
@@ -120,6 +119,8 @@ function remove_service(name)
             delete config._url_to_services[url];
             delete config.services[name];
             _remove_service_from_users(name);
+            _app.write_users();
+            _app.write_config();
             return _app.tools.result(true);
         }
         return _app.tools.result(false, "Service does not exist: " + name);
@@ -138,6 +139,7 @@ function set_permissions(username, permissions)
     if (user)
     {
         user.permissions = permissions;
+        _app.write_users();
         return _app.tools.result(true);
     }
     return _app.tools.result(false, "No user named: " + username);

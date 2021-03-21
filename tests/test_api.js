@@ -3,19 +3,18 @@ const assert = require('assert').strict;
 process.chdir(__dirname)
 
 const tools = require("../private/js/tools.js");
-tools.write_json({}, "./configurations/test_passwords.json");
-tools.write_json({
+assert(tools.write_json({}, "./configurations/test_passwords.json"));
+assert(tools.write_json({
     debug: true,
     port: 1337,
     passwords: "./configurations/test_passwords.json",
     cookie_domain: ".domain.ovh",
     service_method: "subdomain",
     services: {}
-}, "./configurations/test_conf.json");
+}, "./configurations/test_conf.json"));
 
 const sa_app = require("../private/js/app.js");
-if (sa_app.init('./configurations/test_conf.json') == false)
-    return 1;
+assert(sa_app.init('./configurations/test_conf.json'));
 
 var ret;
 
