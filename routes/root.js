@@ -1,24 +1,19 @@
 var express = require('express'),
     router = express();
 
-module.exports = function(configuration, users)
+module.exports = function(sa_app)
 {
-    const sa_session = require("../private/js/session.js")
-    sa_session.init(configuration, users);
-    const sa_auth = require("../private/js/auth.js");
-    sa_auth.init(configuration, users);
-
     router.post("/login", (req, res) => {
         let username = req.body.username;
         let password = req.body.password;
         //let url = req.session.url;
 
-        if (configuration.debug)
+        if (sa_app.get_config().debug)
         {
             console.log("-> Log in post");
             //console.log(req.session);
         }
-        if (sa_auth.validateCredentials(users, username, password))
+        if (sa_app.auth.validateCredentials(sa_app.get_users(), username, password))
         {
             req.session.user = username;
             /*
@@ -40,7 +35,7 @@ module.exports = function(configuration, users)
 
     router.get("/logout", function(req, res)
     {
-        if (configuration.debug)
+        if (sa_app.get_config().debug)
             console.log("-> Log out");
         req.session.destroy(function(err)
         {
@@ -50,7 +45,7 @@ module.exports = function(configuration, users)
 
     router.get("/login", (req, res) => {
         let url = req.query.url;
-        if (configuration.debug)
+        if (sa_app.get_config().debug)
         {
             console.log("-> Log in get");
             //console.log(req.session);
@@ -60,7 +55,7 @@ module.exports = function(configuration, users)
         if (req.session.url == undefined)
             req.session.url = req.query.url;
         */
-        var user = sa_session.getUserSession(req);
+        var user = sa_app.session.getUserSession(req);
         if (user == undefined)
             res.render("login");
         else
@@ -73,19 +68,19 @@ module.exports = function(configuration, users)
     });
 
     router.get("/auth", (req, res) => {
-        if (configuration.debug)
+        if (sa_app.get_config().debug)
         {
             console.log("-> Authentication");
             //console.log(req.session);
         }
-        if (sa_session.validateSession(req))
+        if (sa_app.session.validateSession(req))
             res.sendStatus(200);
         else
             res.sendStatus(401);
     });
 
     router.get("/", (req, res) => {
-        var user = sa_session.getUserSession(req);
+        var user = sa_app.session.getUserSession(req);
         if (user == undefined)
             res.redirect("/login");
         else
@@ -97,13 +92,13 @@ module.exports = function(configuration, users)
     });
 
     router.get("/admin", (req, res) => {
-        var user = sa_session.getUserSession(req);
-        if (user == undefined || !sa_session.isAdmin(user))
+        var user = sa_app.session.getUserSession(req);
+        if (user == undefined || !sa_app.session.isAdmin(user))
             res.redirect("/login");
         else
             res.render('admin', {
                 username: user.username,
-                users: users
+                users: sa_app.get_users()
             })
     });
 
