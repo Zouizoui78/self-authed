@@ -13,7 +13,7 @@ function _get_service_from_request(req)
     let origin = req.headers.origin;
     if (origin == undefined)
         origin = req.headers.referer;
-    let url = _app.tools.getDomainFromUrl(origin);
+    let url = _app.tools.get_domain_from_url(origin);
     if (!origin || !url)
     {
         console.error("Origin unknown: '" + origin + "' try adding Origin in http headers");
@@ -22,7 +22,7 @@ function _get_service_from_request(req)
     if (_app.get_config().debug)
         console.log("Origin URL: " + url);
     if (_app.get_config().service_method == "subdomain")
-        return _app.tools.getSubdomainFromDomain(url);
+        return _app.tools.get_domain_from_domain(url);
     else if (_app.get_config().service_method == "list")
     {
         if (_app.get_config().services)
