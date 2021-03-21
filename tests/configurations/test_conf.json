@@ -1,0 +1,10 @@
+{
+    "debug": true,
+    "port": 1337,
+    "passwords": "./configurations/test_passwords.json",
+    "cookie_domain": ".domain.ovh",
+    "service_method": "subdomain",
+    "services": {
+        "subdomain.domain.com": "service"
+    }
+}

@@ -1,8 +1,13 @@
-let _configuration = null;
+let _app;
 
-function init(configuration)
+function init(app)
 {
-    _configuration = configuration;
+    _app = app;
+}
+
+function result(good, error_message)
+{
+    return {good: good, error: error_message};
 }
 
 const _crypto = require("crypto");
@@ -20,24 +25,23 @@ function hash(toHash)
         .digest("hex");
 }
 
-function validateCredentials(users, username, passwordCandidate)
+function validateCredentials(username, passwordCandidate)
 {
     let hashed = hash(passwordCandidate);
+    let users = _app.get_users();
     if (users[username] == undefined)
     {
-        console.error("Unknown user: " + username);
-        return false;
+        return result(false, "Unknown user: " + username);
     }
     if (users[username]["password"] == hashed)
     {
-        if (_configuration.debug)
+        if (_app.get_config().debug)
             console.log("Valid password for: " + username);
-        return true;
+        return result(true);
     }
     else
     {
-        console.error("Wrong password for: " + username);
-        return false;
+        return result(false, "Wrong password for: " + username);
     }
 }
 

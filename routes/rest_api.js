@@ -55,6 +55,8 @@ module.exports = function(sa_app)
         if (user)
         {
             let username = req.query.username;
+            if (sa_app.session.isAdmin(user) == false)
+                username = user.username;
             let password = req.query.password;
             let ret = sa_app.api.change_password(username, password);
             if (ret.good)

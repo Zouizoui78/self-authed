@@ -7,14 +7,21 @@ let _session = require("./session.js");
 let _configuration;
 let _users;
 
-function get_config()
+function get_config(id)
 {
+    if (id != undefined)
+        return _configuration[id];
     return _configuration;
 }
 
 function get_users()
 {
     return _users;
+}
+
+function get_user(name)
+{
+    return _users[name];
 }
 
 /* ************************************************************************* */
@@ -97,9 +104,9 @@ function init(configuration_path)
             console.log("Found users:");
             console.log(_users);
         }
-        _api.init(_configuration, _users);
-        _auth.init(_configuration, _users);
-        _session.init(_configuration, _users);
+        _api.init(this);
+        _auth.init(this);
+        _session.init(this);
         return true;
     }
     return false;
@@ -108,6 +115,7 @@ function init(configuration_path)
 module.exports = {
     init: init,
     get_users: get_users,
+    get_user: get_user,
     get_config: get_config,
     api: _api,
     auth: _auth,
