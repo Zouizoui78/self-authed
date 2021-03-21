@@ -109,11 +109,16 @@ module.exports = function(sa_app)
         if (admin)
         {
             let username = req.query.username;
-            let ret = sa_app.api.remove_user(username);
-            if (ret.good)
-                res.status(200).send("Done");
+            if (username == admin.username)
+                res.status(400).send("You cannot remove yourself");
             else
-                res.status(400).send(ret.error)
+            {
+                let ret = sa_app.api.remove_user(username);
+                if (ret.good)
+                    res.status(200).send("Done");
+                else
+                    res.status(400).send(ret.error)
+            }
         }
     });
 

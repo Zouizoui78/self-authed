@@ -1,10 +1,10 @@
-const fs = require('fs');
-
 let _api = require("./api.js");
 let _auth = require("./auth.js");
 let _session = require("./session.js");
+let _tools = require("./tools.js");
 
 let _configuration;
+let _configuration_path;
 let _users;
 
 function get_config(id)
@@ -24,81 +24,13 @@ function get_user(name)
     return _users[name];
 }
 
-/* ************************************************************************* */
-/* Configuration */
-
-function readJson(path)
-{
-    try
-    {
-        let rawdata = fs.readFileSync(path);
-        return JSON.parse(rawdata);
-    }
-    catch(err)
-    {
-        console.error(err.message);
-        return null;
-    }
-}
-
-function read_configuration(path)
-{
-    console.log("Loading configuration: " + path);
-
-    let configuration = readJson(path);
-    if (configuration == null)
-        return null;
-
-    if (configuration.port == undefined)
-        configuration.port = 24080;
-
-    if (configuration.service_method == undefined)
-        configuration.service_method = "subdomain"
-
-    if(configuration.cookie_domain == undefined)
-    {
-        console.error("Required setting 'cookie_domain' not found in configuration.");
-        return null;
-    }
-
-    console.log("Service retrieval from: " + configuration.service_method);
-    if (configuration.service_method == "list" && !configuration.services)
-    {
-        console.error("No service list configured !");
-        return null;
-    }
-    return configuration;
-}
-
-/* ************************************************************************* */
-/* Users and tokens */
-
-function read_users(path)
-{
-    console.log("Loading user file: " + path);
-    let json = readJson(path);
-    if (json == null)
-        return {};
-    let ret = {};
-    for (var i = 0; i < json.length; ++i)
-    {
-        let user = json[i];
-        ret[user.username] = {
-            username: user.username,
-            password: user.password,
-            permissions: user.permissions,
-            admin: user.admin
-        };
-    }
-    return ret;
-}
-
 function init(configuration_path)
 {
-    _configuration = read_configuration(configuration_path);
+    _configuration_path = configuration_path;
+    _configuration = _tools.read_configuration(configuration_path);
     if (_configuration != null)
     {
-        _users = read_users(_configuration.passwords);
+        _users = _tools.read_users(_configuration.passwords);
         if (_configuration.debug)
         {
             console.log("Found users:");
@@ -112,12 +44,26 @@ function init(configuration_path)
     return false;
 }
 
+function write_users()
+{
+    _tools.write_json(_users, _configuration.passwords);
+}
+
+function write_config()
+{
+    const clone_conf = Object.assign({}, _configuration);
+    delete clone_conf._url_to_services;
+    _tools.write_json(clone_conf, _configuration_path);
+}
+
 module.exports = {
     init: init,
     get_users: get_users,
     get_user: get_user,
     get_config: get_config,
+    write_config: write_config,
     api: _api,
     auth: _auth,
     session: _session,
+    tools: _tools,
 }

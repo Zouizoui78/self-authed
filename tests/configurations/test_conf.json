@@ -5,6 +5,6 @@
     "cookie_domain": ".domain.ovh",
     "service_method": "subdomain",
     "services": {
-        "subdomain.domain.com": "service"
+        "service": "subdomain.domain.com"
     }
 }

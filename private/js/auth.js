@@ -5,11 +5,6 @@ function init(app)
     _app = app;
 }
 
-function result(good, error_message)
-{
-    return {good: good, error: error_message};
-}
-
 const _crypto = require("crypto");
 
 function generateToken(length)
@@ -31,23 +26,23 @@ function validateCredentials(username, passwordCandidate)
     let users = _app.get_users();
     if (users[username] == undefined)
     {
-        return result(false, "Unknown user: " + username);
+        return _app.tools.result(false, "Unknown user: " + username);
     }
     if (users[username]["password"] == hashed)
     {
         if (_app.get_config().debug)
             console.log("Valid password for: " + username);
-        return result(true);
+        return _app.tools.result(true);
     }
     else
     {
-        return result(false, "Wrong password for: " + username);
+        return _app.tools.result(false, "Wrong password for: " + username);
     }
 }
 
 module.exports = {
     "init": init,
-    "generateToken": generateToken,
     "hash": hash,
+    "generateToken": generateToken,
     "validateCredentials": validateCredentials,
 }

@@ -62,7 +62,7 @@ function getServiceFromRequest(req)
     else if (_app.get_config().service_method == "list")
     {
         if (_app.get_config().services)
-            return _app.get_config().services[url];
+            return _app.get_config()._url_to_services[url];
         console.error("No service list configured !");
     }
 }
