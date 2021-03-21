@@ -12,7 +12,7 @@ function checkPermissions(user, service)
 {
     var permissions = user.permissions;
     if (_app.get_config().debug)
-        console.log("Permissions for user: '" + user.username + "' -> " + user.permissions);
+        console.log("Permission check for " + user.username + "[" + user.permissions + "] -> " + service);
     if (permissions)
     {
         if (permissions.includes("all"))
@@ -111,6 +111,7 @@ function isAdmin(user)
 module.exports = {
     "validateSession": validateSession,
     "getUserSession": getUserSession,
+    "checkPermissions": checkPermissions,
     "isAdmin": isAdmin,
     "init": init,
 }

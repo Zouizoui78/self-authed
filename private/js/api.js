@@ -17,7 +17,7 @@ function _check_is_obj(data)
 
 function _check_is_array(data)
 {
-    return _check_is_obj(data) && data.isArray();
+    return Array.isArray(data);
 }
 
 function verif_password(password)
