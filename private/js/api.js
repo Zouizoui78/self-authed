@@ -14,8 +14,9 @@ function verif_password(password)
 {
     if (typeof(password) != "string")
         return result(false, "Password is not a string");
-    if (password.length <= _app.get_config("password_min_length"))
-        return result(false, "Password must be longer than 5 char");
+    let password_min_length = _app.get_config("password_min_length");
+    if (password.length <= password_min_length)
+        return result(false, "Password must be longer than " + password_min_length + " chars");
     return result(true);
 }
 
