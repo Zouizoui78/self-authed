@@ -21,7 +21,7 @@ app.use(bodyParser.urlencoded({ extended: false })); // Forms request body parsi
 // With this middleware enabled everything stored in req.session is saved across requests
 app.use(session({
     name: "session",
-    secret: sa_app.auth.generateToken(20),
+    secret: sa_app.auth.generate_token(20),
     saveUninitialized: false, // true -> deprecated
     resave: false, // true -> deprecated
     cookie: {

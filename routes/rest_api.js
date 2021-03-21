@@ -15,10 +15,10 @@ function not_admin(res)
 
 function get_admin_user(req, res, sa_app)
 {
-    var user = sa_app.session.getUserSession(req);
+    var user = sa_app.session.get_user_session(req);
     if (user)
     {
-        if (sa_app.session.isAdmin(user))
+        if (sa_app.session.is_admin(user))
         {
             return user;
         }
@@ -38,7 +38,7 @@ module.exports = function(sa_app)
     });
 
     router.get("/permissions", (req, res) => {
-        var user = sa_app.session.getUserSession(req);
+        var user = sa_app.session.get_user_session(req);
         if (user)
         {
             res.setHeader('Content-Type', 'application/json');
@@ -51,7 +51,7 @@ module.exports = function(sa_app)
     });
 
     router.post("/change_password", (req, res) => {
-        var user = sa_app.session.getUserSession(req);
+        var user = sa_app.session.get_user_session(req);
         if (user)
         {
             let username = req.query.username;

@@ -41,21 +41,21 @@ assert(ret && ret.good == false, ret.error);
 // User password
 //
 
-ret = sa_app.auth.validateCredentials("test", "password");
+ret = sa_app.auth.validate_credentials("test", "password");
 assert(ret && ret.good, ret.error);
 
 // Credentials wrong
-ret = sa_app.auth.validateCredentials("test", "password2");
+ret = sa_app.auth.validate_credentials("test", "password2");
 assert(ret && ret.good == false, ret.error);
 
 ret = sa_app.api.change_password("test", "password3");
 assert(ret && ret.good, ret.error);
 
 // Credentials wrong after password change
-ret = sa_app.auth.validateCredentials("test", "password");
+ret = sa_app.auth.validate_credentials("test", "password");
 assert(ret && ret.good == false, ret.error);
 
-ret = sa_app.auth.validateCredentials("test", "password3");
+ret = sa_app.auth.validate_credentials("test", "password3");
 assert(ret && ret.good, ret.error);
 
 //
@@ -65,7 +65,7 @@ assert(ret && ret.good, ret.error);
 ret = sa_app.api.remove_user("test");
 assert(ret && ret.good, ret.error);
 
-ret = sa_app.auth.validateCredentials("test", "password");
+ret = sa_app.auth.validate_credentials("test", "password");
 assert(ret && ret.good == false, ret.error);
 
 ret = sa_app.api.change_password("test", "password3");
@@ -99,28 +99,25 @@ assert(ret && ret.good, ret.error);
 ret = sa_app.api.set_permissions("test", ["service", "service2"]);
 assert(ret && ret.good, ret.error);
 
-var user = sa_app.get_user("test");
-ret = sa_app.session.checkPermissions(user, "service");
-assert(ret);
+ret = sa_app.api.check_permissions("test", "service");
+assert(ret && ret.good, ret.error);
 
-user = sa_app.get_user("test2");
-ret = sa_app.session.checkPermissions(user, "service");
-assert(ret == false);
-user.permissions = ["all"];
-ret = sa_app.session.checkPermissions(user, "service");
-assert(ret);
+ret = sa_app.api.check_permissions("test2", "service");
+assert(ret && ret.good == false, ret.error);
+sa_app.get_user('test2').permissions = ["all"];
+ret = sa_app.api.check_permissions("test2", "service");
+assert(ret && ret.good, ret.error);
 
 //
 // Service removal
 //
 
-user = sa_app.get_user('test3');
 sa_app.api.set_permissions("test3", ["service3"]);
-ret = sa_app.session.checkPermissions(user, "service3");
-assert(ret);
+ret = sa_app.api.check_permissions("test3", "service3");
+assert(ret && ret.good, ret.error);
 
 ret = sa_app.api.remove_service("service3");
 assert(ret && ret.good, ret.error);
-ret = sa_app.session.checkPermissions(user, "service3");
-assert(ret == false);
-assert(user.permissions.length == 0);
+ret = sa_app.api.check_permissions("test3", "service3");
+assert(ret && ret.good == false, ret.error);
+assert(sa_app.get_user('test3').permissions.length == 0);

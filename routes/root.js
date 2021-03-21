@@ -14,7 +14,7 @@ module.exports = function(sa_app)
         {
             console.log("-> Log in post");
         }
-        var ret = sa_app.auth.validateCredentials(username, password);
+        var ret = sa_app.auth.validate_credentials(username, password);
         if (ret.good)
         {
             req.session.user = username;
@@ -41,7 +41,7 @@ module.exports = function(sa_app)
             console.log("-> Log in get");
             console.log("url = " + url)
         }
-        var user = sa_app.session.getUserSession(req);
+        var user = sa_app.session.get_user_session(req);
         if (user == undefined)
             res.render("login");
         else
@@ -58,14 +58,14 @@ module.exports = function(sa_app)
         {
             console.log("-> Authentication");
         }
-        if (sa_app.session.validateSession(req))
+        if (sa_app.session.validate_session(req))
             res.sendStatus(200);
         else
             res.sendStatus(401);
     });
 
     router.get("/", (req, res) => {
-        var user = sa_app.session.getUserSession(req);
+        var user = sa_app.session.get_user_session(req);
         if (user == undefined)
             res.redirect("/login");
         else
@@ -77,8 +77,8 @@ module.exports = function(sa_app)
     });
 
     router.get("/admin", (req, res) => {
-        var user = sa_app.session.getUserSession(req);
-        if (user == undefined || !sa_app.session.isAdmin(user))
+        var user = sa_app.session.get_user_session(req);
+        if (user == undefined || !sa_app.session.is_admin(user))
             res.redirect("/login");
         else
             res.render('admin', {

@@ -134,6 +134,27 @@ function update_list(toupdate, updater)
     }
 }
 
+// http://www.primaryobjects.com/2012/11/19/parsing-hostname-and-domain-from-a-url-with-javascript/
+function getDomainFromUrl(url)
+{
+    if (!url)
+        return "";
+    var match = url.match(/:\/\/(www[0-9]?\.)?(.[^/:]+)/i);
+    if (match != null && match.length > 2 && typeof match[2] === 'string' && match[2].length > 0)
+    {
+        return match[2];
+    }
+    return url;
+}
+
+function getSubdomainFromDomain(url)
+{
+    var split = url.split('.');
+    if (split.length > 0)
+        return split[0];
+    return null;
+}
+
 module.exports = {
     "result": result,
     "update_object": update_object,
@@ -142,4 +163,6 @@ module.exports = {
     "write_json": write_json,
     "read_users": read_users,
     "read_configuration": read_configuration,
+    "getSubdomainFromDomain": getSubdomainFromDomain,
+    "getDomainFromUrl": getDomainFromUrl,
 }

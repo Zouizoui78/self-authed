@@ -15,7 +15,7 @@ function _check_is_array(data)
     return Array.isArray(data);
 }
 
-function verif_password(password)
+function _verif_password(password)
 {
     if (typeof(password) != "string")
         return _app.tools.result(false, "Password is not a string");
@@ -30,7 +30,7 @@ function change_password(username, password)
     var user = _app.get_users()[username];
     if (user)
     {
-        var ret = verif_password(password);
+        var ret = _verif_password(password);
         if (ret.good == true)
             user.password = _app.auth.hash(password);
         _app.write_users();
@@ -45,7 +45,7 @@ function add_user(username, password)
     var user = users[username];
     if (!user)
     {
-        var ret = verif_password(password);
+        var ret = _verif_password(password);
         if (ret.good == true)
         {
             users[username] = {
@@ -142,7 +142,22 @@ function set_permissions(username, permissions)
         _app.write_users();
         return _app.tools.result(true);
     }
-    return _app.tools.result(false, "No user named: " + username);
+    return _app.tools.result(false, "No such user: " + username);
+}
+
+function check_permissions(username, service)
+{
+    var user = _app.get_user(username);
+    if (user)
+    {
+        var permissions = user.permissions;
+        if (_app.get_config("debug"))
+            console.log("Permission check for " + username + "[" + user.permissions + "] -> " + service);
+        if (permissions && (permissions.includes("all") || permissions.includes(service)))
+            return _app.tools.result(true);
+        return _app.tools.result(false, "User '" + username + '" cannot access: ' + service);
+    }
+    return _app.tools.result(false, "No such user: " + username);
 }
 
 module.exports = {
@@ -153,4 +168,5 @@ module.exports = {
     remove_user: remove_user,
     change_password: change_password,
     set_permissions: set_permissions,
+    check_permissions: check_permissions,
 }

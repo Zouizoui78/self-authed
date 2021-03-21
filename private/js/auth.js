@@ -7,7 +7,7 @@ function init(app)
 
 const _crypto = require("crypto");
 
-function generateToken(length)
+function generate_token(length)
 {
     return _crypto.randomBytes(length).toString('hex');
 }
@@ -20,7 +20,7 @@ function hash(toHash)
         .digest("hex");
 }
 
-function validateCredentials(username, passwordCandidate)
+function validate_credentials(username, passwordCandidate)
 {
     let hashed = hash(passwordCandidate);
     let users = _app.get_users();
@@ -43,6 +43,6 @@ function validateCredentials(username, passwordCandidate)
 module.exports = {
     "init": init,
     "hash": hash,
-    "generateToken": generateToken,
-    "validateCredentials": validateCredentials,
+    "generate_token": generate_token,
+    "validate_credentials": validate_credentials,
 }

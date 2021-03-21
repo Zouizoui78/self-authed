@@ -8,48 +8,12 @@ function init(app)
     _app = app;
 }
 
-function checkPermissions(user, service)
-{
-    var permissions = user.permissions;
-    if (_app.get_config().debug)
-        console.log("Permission check for " + user.username + "[" + user.permissions + "] -> " + service);
-    if (permissions)
-    {
-        if (permissions.includes("all"))
-            return true;
-        if (permissions.includes(service))
-            return true;
-    }
-    return false;
-}
-
-// http://www.primaryobjects.com/2012/11/19/parsing-hostname-and-domain-from-a-url-with-javascript/
-function getDomainFromUrl(url)
-{
-    if (!url)
-        return "";
-    var match = url.match(/:\/\/(www[0-9]?\.)?(.[^/:]+)/i);
-    if (match != null && match.length > 2 && typeof match[2] === 'string' && match[2].length > 0)
-    {
-        return match[2];
-    }
-    return url;
-}
-
-function getSubdomainFromDomain(url)
-{
-    var split = url.split('.');
-    if (split.length > 0)
-        return split[0];
-    return null;
-}
-
-function getServiceFromRequest(req)
+function _get_service_from_request(req)
 {
     let origin = req.headers.origin;
     if (origin == undefined)
         origin = req.headers.referer;
-    let url = getDomainFromUrl(origin);
+    let url = _app.tools.getDomainFromUrl(origin);
     if (!origin || !url)
     {
         console.error("Origin unknown: '" + origin + "' try adding Origin in http headers");
@@ -58,7 +22,7 @@ function getServiceFromRequest(req)
     if (_app.get_config().debug)
         console.log("Origin URL: " + url);
     if (_app.get_config().service_method == "subdomain")
-        return getSubdomainFromDomain(url);
+        return _app.tools.getSubdomainFromDomain(url);
     else if (_app.get_config().service_method == "list")
     {
         if (_app.get_config().services)
@@ -67,31 +31,33 @@ function getServiceFromRequest(req)
     }
 }
 
-function getUserSession(req)
+function get_user_session(req)
 {
     return req.session != undefined ? _app.get_users()[req.session.user] : undefined;
 }
 
-function validateSession(req)
+function validate_session(req)
 {
-    var user = getUserSession(req);
+    var user = get_user_session(req);
     if (user != undefined)
     {
+        var username = user.username;
         if (_app.get_config().debug)
-            console.log("Found session for: " + user.username);
-        var service = getServiceFromRequest(req);
+            console.log("Found session for: " + username);
+        var service = _get_service_from_request(req);
         if (service != undefined && service != null)
         {
             if (_app.get_config().debug)
-                console.log("User '" + user.username + "' wants to use service: " + service);
-            if (checkPermissions(user, service))
+                console.log("User '" + username + "' wants to use service: " + service);
+            var ret = _app.api.check_permissions(username, service);
+            if (ret.good)
             {
                 if (_app.get_config().debug)
-                    console.log("Permission accorded for: " + user.username);
+                    console.log("Permission accorded for: " + username);
                 return true;
             }
             else
-                console.error(user.username + " does not have permissions for service: " + service);
+                console.error(ret.error);
         }
         else
             console.error("Could not find service in request");
@@ -101,7 +67,7 @@ function validateSession(req)
     return false;
 }
 
-function isAdmin(user)
+function is_admin(user)
 {
     if (!user)
         return false;
@@ -109,9 +75,8 @@ function isAdmin(user)
 }
 
 module.exports = {
-    "validateSession": validateSession,
-    "getUserSession": getUserSession,
-    "checkPermissions": checkPermissions,
-    "isAdmin": isAdmin,
+    "validate_session": validate_session,
+    "get_user_session": get_user_session,
+    "is_admin": is_admin,
     "init": init,
 }
