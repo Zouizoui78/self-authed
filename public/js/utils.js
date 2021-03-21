@@ -83,3 +83,33 @@ ajax.post = function (url, data, onSuccess, onError, onEnd, async)
     }
     ajax.send(url, 'POST', query.join('&'), onSuccess, onError, onEnd, async);
 };
+
+function loading_add()
+{
+    //TODO
+}
+
+function loading_remove()
+{
+    //TODO
+}
+
+function forms_add_validation()
+{
+    // Fetch all the forms we want to apply custom Bootstrap validation styles to
+    var forms = document.querySelectorAll('.needs-validation');
+
+    // Loop over them and prevent submission
+    Array.prototype.slice.call(forms).forEach(function(form)
+    {
+        form.addEventListener('submit', function(event)
+        {
+            if (!form.checkValidity())
+            {
+                event.preventDefault()
+                event.stopPropagation()
+            }
+            form.classList.add('was-validated')
+        }, false);
+    });
+}
