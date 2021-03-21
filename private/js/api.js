@@ -22,11 +22,12 @@ function _check_is_array(data)
 
 function verif_password(password)
 {
-    if (_check_is_string(password) == false)
-        return _app.tools.result(false, "Password is not a string");
-    if (password.length <= 5)
-        return _app.tools.result(false, "Password must be longer than 5 char");
-    return _app.tools.result(true);
+    if (typeof(password) != "string")
+        return result(false, "Password is not a string");
+    let password_min_length = _app.get_config("password_min_length");
+    if (password.length <= password_min_length)
+        return result(false, "Password must be longer than " + password_min_length + " chars");
+    return result(true);
 }
 
 function change_password(username, password)

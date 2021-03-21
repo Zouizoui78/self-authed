@@ -38,6 +38,9 @@ function read_configuration(path)
     if (configuration.service_method == undefined)
         configuration.service_method = "subdomain"
 
+    if (configuration.password_min_length == undefined)
+        configuration.password_min_length = 5;
+
     if(configuration.cookie_domain == undefined)
     {
         console.error("Required setting 'cookie_domain' not found in configuration.");
