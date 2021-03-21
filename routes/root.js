@@ -3,6 +3,9 @@ var express = require('express'),
 
 module.exports = function(sa_app)
 {
+    var api = require('./rest_api')(sa_app);
+    router.use("/api", api);
+
     router.post("/login", (req, res) => {
         let username = req.body.username;
         let password = req.body.password;

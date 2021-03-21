@@ -7,7 +7,6 @@ const server = require('http').createServer(app);
 
 var bodyParser = require("body-parser");
 const session = require('express-session');
-const { config } = require('process');
 
 const sa_app = require("./private/js/app.js");
 if (sa_app.init('./conf.json') == false)
@@ -43,9 +42,6 @@ app.use(express.static('public'));
 
 var root = require('./routes/root')(sa_app);
 app.use("/", root);
-
-var api = require('./routes/rest_api')(sa_app);
-app.use("/api", api);
 
 /* ************************************************************************* */
 /* Start */
