@@ -21,7 +21,7 @@ module.exports = function(sa_app)
             res.status(200).send("okkkkkk");
         }
         else
-            res.status(400).send(ret.error);
+            res.status(400).send(ret);
     });
 
     router.get("/logout", function(req, res)

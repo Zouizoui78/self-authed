@@ -18,10 +18,10 @@ function _check_is_array(data)
 function _verif_password(password)
 {
     if (typeof(password) != "string")
-        return _app.tools.result(false, "Password is not a string");
+        return _app.tools.result(false, "Password is not a string", 1);
     let password_min_length = _app.get_config("password_min_length");
     if (password.length <= password_min_length)
-        return _app.tools.result(false, "Password must be longer than " + password_min_length + " chars");
+        return _app.tools.result(false, "Password must be longer than " + password_min_length + " chars", 2);
     return _app.tools.result(true);
 }
 
@@ -36,7 +36,7 @@ function change_password(username, password)
         _app.write_users();
         return ret;
     }
-    return _app.tools.result(false, "No such user: " + username);
+    return _app.tools.result(false, "No such user", 3);
 }
 
 function add_user(username, password)
@@ -57,7 +57,7 @@ function add_user(username, password)
         }
         return ret;
     }
-    return _app.tools.result(false, "User already exist: " + username);
+    return _app.tools.result(false, "User already exist", 3);
 }
 
 function remove_user(username)
@@ -70,18 +70,18 @@ function remove_user(username)
         _app.write_users();
         return _app.tools.result(true);
     }
-    return _app.tools.result(false, "User does not exist: " + username);
+    return _app.tools.result(false, "User does not exist");
 }
 
 function add_service(name, url)
 {
     if (_check_is_string(name) == false)
-        return _app.tools.result(false, "Service name is not a string");
+        return _app.tools.result(false, "Service name is not a string", 1);
     if (_check_is_string(url) == false)
-        return _app.tools.result(false, "Service url is not a string");
+        return _app.tools.result(false, "Service url is not a string", 2);
     var config = _app.get_config();
     if (name == "all")
-        return _app.tools.result(false, "Cannot have a service named 'all'");
+        return _app.tools.result(false, "Cannot have a service named 'all'", 3);
     config.services[name] = url;
     config._url_to_services[url] = name;
     _app.write_config();
@@ -109,7 +109,7 @@ function _remove_service_from_users(name)
 function remove_service(name)
 {
     if (_check_is_string(name) == false)
-        return _app.tools.result(false, "Service name is not a string");
+        return _app.tools.result(false, "Service name is not a string", 1);
     var config = _app.get_config();
     if (config.services)
     {
@@ -123,17 +123,17 @@ function remove_service(name)
             _app.write_config();
             return _app.tools.result(true);
         }
-        return _app.tools.result(false, "Service does not exist: " + name);
+        return _app.tools.result(false, "Service does not exist", 2);
     }
-    return _app.tools.result(false, "No services");
+    return _app.tools.result(false, "No services", 3);
 }
 
 function set_permissions(username, permissions)
 {
     if (_check_is_string(username) == false)
-        return _app.tools.result(false, "Username is not a string");
+        return _app.tools.result(false, "Username is not a string", 1);
     if (_check_is_array(permissions) == false)
-        return _app.tools.result(false, "Permissions is not an array");
+        return _app.tools.result(false, "Permissions is not an array", 2);
     var users = _app.get_users();
     var user = users[username];
     if (user)
@@ -142,7 +142,7 @@ function set_permissions(username, permissions)
         _app.write_users();
         return _app.tools.result(true);
     }
-    return _app.tools.result(false, "No such user: " + username);
+    return _app.tools.result(false, "No such user", 3);
 }
 
 function check_permissions(username, service)
@@ -155,9 +155,9 @@ function check_permissions(username, service)
             console.log("Permission check for " + username + "[" + user.permissions + "] -> " + service);
         if (permissions && (permissions.includes("all") || permissions.includes(service)))
             return _app.tools.result(true);
-        return _app.tools.result(false, "User '" + username + '" cannot access: ' + service);
+        return _app.tools.result(false, "Permission denied", 1);
     }
-    return _app.tools.result(false, "No such user: " + username);
+    return _app.tools.result(false, "No such user", 2);
 }
 
 module.exports = {

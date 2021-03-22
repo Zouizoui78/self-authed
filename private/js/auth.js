@@ -24,20 +24,15 @@ function validate_credentials(username, passwordCandidate)
 {
     let hashed = hash(passwordCandidate);
     let users = _app.get_users();
+    let debug = _app.get_config().debug;
+    if (debug)
+        console.log("Validation credentials for user: " + username);
     if (users[username] == undefined)
-    {
-        return _app.tools.result(false, "Unknown user: " + username);
-    }
+        return _app.tools.result(false, "Unknown user", 1);
     if (users[username]["password"] == hashed)
-    {
-        if (_app.get_config().debug)
-            console.log("Valid password for: " + username);
         return _app.tools.result(true);
-    }
     else
-    {
-        return _app.tools.result(false, "Wrong password for: " + username);
-    }
+        return _app.tools.result(false, "Wrong password", 2);
 }
 
 module.exports = {

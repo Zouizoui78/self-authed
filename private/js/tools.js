@@ -1,9 +1,8 @@
 const fs = require('fs');
-const { config } = require('process');
 
-function result(good, error_message)
+function result(good, error_message, code)
 {
-    return {good: good, error: error_message};
+    return {good: good, error: error_message, code: code};
 }
 
 /* ************************************************************************* */
