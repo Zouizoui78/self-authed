@@ -22,7 +22,7 @@ function _get_service_from_request(req)
     if (_app.get_config().debug)
         console.log("Origin URL: " + url);
     if (_app.get_config().service_method == "subdomain")
-        return _app.tools.get_domain_from_domain(url);
+        return _app.tools.get_domain_from_url(url);
     else if (_app.get_config().service_method == "list")
     {
         if (_app.get_config().services)
