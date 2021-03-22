@@ -4,8 +4,17 @@ var _password;
 var _validation_username;
 var _validation_password;
 
+function clear_login_validation()
+{
+    _validation_username.innerHTML = "";
+    _validation_password.innerHTML = "";
+    _username.classList.remove("is-invalid");
+    _password.classList.remove("is-invalid");
+}
+
 function do_login()
 {
+    clear_login_validation();
     ajax.post("/login", {
         username: _username.value,
         password: _password.value
