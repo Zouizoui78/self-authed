@@ -39,6 +39,7 @@ function get_user_session(req)
 function validate_session(req)
 {
     var user = get_user_session(req);
+
     if (user != undefined)
     {
         var username = user.username;
