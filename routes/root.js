@@ -18,7 +18,7 @@ module.exports = function(sa_app)
         if (ret.good)
         {
             req.session.user = username;
-            res.status(200).send("okkkkkk");
+            res.status(200).send("ok");
         }
         else
             res.status(400).send(ret);

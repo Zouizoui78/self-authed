@@ -1,6 +1,9 @@
 var _list;
 var _password;
+var _validation_password;
 var _password_repeat;
+var _validation_password_repeat;
+var _valid_change;
 
 function update_user_permissions(lst)
 {
@@ -34,33 +37,68 @@ function password_check_same()
 {
     if (_password.value != _password_repeat.value)
     {
-        console.error("Passwords are not the same");
+        _validation_password_repeat.innerHTML = "Passwords are not the same";
+        _password_repeat.classList.add("is-invalid");
+        console.error("Passwords are not the same.");
         return false;
     }
     return true;
 }
 
-function passsword_clear_fields()
+function password_clear_fields()
 {
     _password.value = "";
     _password_repeat.value = "";
 }
 
+function password_clear_hints()
+{
+    _valid_change.innerHTML = "";
+    _validation_password.innerHTML = "";
+    _validation_password_repeat.innerHTML = "";
+    _password.classList.remove("is-valid");
+    _password.classList.remove("is-invalid");
+    _password_repeat.classList.remove("is-valid");
+    _password_repeat.classList.remove("is-invalid");
+}
+
 function password_validate()
 {
-    passsword_clear_fields();
-    // TODO print done on form
+    password_clear_fields();
+    password_clear_hints();
+    _valid_change.innerHTML = "Done";
+    _password.classList.add("is-valid");
+    _password_repeat.classList.add("is-valid");
+    console.log("Password changed");
 }
 
 function password_error(err)
 {
-    console.error(err);
-    // TODO print error on form
+    console.log(err);
+    var data = JSON.parse(err);
+    console.error(data);
+    /*
+    if (data.code == 1)
+    {
+        _validation_username.innerHTML = data.error;
+        _username.classList.add("is-invalid");
+    }
+    else if (data.code == 2)
+    {
+        _validation_password.innerHTML = data.error;
+        _password.classList.add("is-invalid");
+    }
+    */
+    password_clear_hints();
+    _validation_password_repeat.innerHTML = data.error;
+    _password_repeat.classList.add("is-invalid");
 }
 
 function password_change()
 {
-    if (!_password)
+    if (!_password || !_validation_password
+        || !_password_repeat || !_validation_password_repeat
+        || !_valid_change)
         return ;
     loading_add();
     if (password_check_same())
@@ -76,9 +114,15 @@ function password_change()
 document.addEventListener("DOMContentLoaded", function(event)
 {
     console.log("Home loaded");
-    _list = document.getElementById("permissions");
-    _password = document.getElementById("password");
-    _password_repeat = document.getElementById("password-repeat");
+    _list = get_doc_id("permissions");
+    _password = get_doc_id("password");
+    _validation_password = get_doc_id("validation-password");
+    _password_repeat = get_doc_id("password-repeat");
+    _validation_password_repeat = get_doc_id("validation-password-repeat");
+    _valid_change = get_doc_id("valid-change");
+    var change_password_btn = get_doc_id("change-password-btn");
+    if (change_password_btn)
+        change_password_btn.addEventListener("click", password_change);
     load_user_permissions();
     forms_add_validation();
 });

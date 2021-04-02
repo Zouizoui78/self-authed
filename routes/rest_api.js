@@ -5,12 +5,14 @@ var express = require('express'),
 
 function not_logged_in(res)
 {
-    res.status(401).send("Not logged in");
+    var ret = sa_app.tools.result(false, "Not logged in", 11);
+    res.status(401).send(ret);
 }
 
 function not_admin(res)
 {
-    res.status(401).send("You are not admin");
+    var ret = sa_app.tools.result(false, "You are not admin", 10);
+    res.status(401).send(ret);
 }
 
 function get_admin_user(req, res, sa_app)
@@ -55,14 +57,14 @@ module.exports = function(sa_app)
         if (user)
         {
             let username = req.query.username;
-            if (sa_app.session.isAdmin(user) == false)
+            if (!username || sa_app.session.is_admin(user) == false)
                 username = user.username;
-            let password = req.query.password;
+            let password = req.body.password;
             let ret = sa_app.api.change_password(username, password);
             if (ret.good)
                 res.status(200).send("Done");
             else
-                res.status(400).send(ret.error);
+                res.status(400).send(ret);
         }
         else
         {

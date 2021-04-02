@@ -39,10 +39,12 @@ ajax.send = function (url, method, data, onSuccess, onError, onEnd, async)
         {
             if (x.status >= 200 && x.status < 300)
             {
-                //console.log(x.responseText);
+                /*
+                console.log(x.responseText);
                 console.log(x.statusText);
                 console.log(x.getAllResponseHeaders());
                 console.log(x.responseURL);
+                */
                 if (onSuccess)
                     onSuccess(x.responseText, x);
             }
@@ -112,4 +114,12 @@ function forms_add_validation()
             form.classList.add('was-validated')
         }, false);
     });
+}
+
+function get_doc_id(id)
+{
+    var ret = document.getElementById(id);
+    if (!ret)
+        console.error("Could not find id: " + id);
+    return ret;
 }

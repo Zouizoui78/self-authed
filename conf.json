@@ -1,10 +1,10 @@
 {
     "debug": false,
     "port": 24080,
-    "passwords": "./passwords",
-    "cookie_domain": ".domain.com",
+    "passwords": "./passwords.json",
+    "cookie_domain": ".domain.ovh",
     "service_method": "subdomain",
     "services": {
-        "subdomain.domain.com": "service"
+        "service": "subdomain.domain.com"
     }
 }

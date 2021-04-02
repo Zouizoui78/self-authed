@@ -42,11 +42,11 @@ function do_login()
 document.addEventListener("DOMContentLoaded", function(event)
 {
     console.log("Loaded login");
-    var log_btn = document.getElementById("log-btn");
+    var log_btn = get_doc_id("log-btn");
     if (log_btn)
         log_btn.addEventListener("click", do_login);
-    _username = document.getElementById("username");
-    _password = document.getElementById("password");
-    _validation_username = document.getElementById("validation_username");
-    _validation_password = document.getElementById("validation_password");
+    _username = get_doc_id("username");
+    _validation_username = get_doc_id("validation-username");
+    _password = get_doc_id("password");
+    _validation_password = get_doc_id("validation-password");
 });

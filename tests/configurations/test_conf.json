@@ -1,0 +1,12 @@
+{
+  "debug": true,
+  "port": 1337,
+  "passwords": "./configurations/test_passwords.json",
+  "cookie_domain": ".domain.ovh",
+  "service_method": "subdomain",
+  "services": {
+    "service": "renamed.domain.com",
+    "service2": "other.domain.com"
+  },
+  "password_min_length": 5
+}

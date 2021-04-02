@@ -32,8 +32,10 @@ function change_password(username, password)
     {
         var ret = _verif_password(password);
         if (ret.good == true)
+        {
             user.password = _app.auth.hash(password);
-        _app.write_users();
+            _app.write_users();
+        }
         return ret;
     }
     return _app.tools.result(false, "No such user", 3);

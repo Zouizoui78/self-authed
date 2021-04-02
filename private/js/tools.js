@@ -76,15 +76,18 @@ function read_users(path)
     if (json == null)
         return {};
     let ret = {};
-    for (var i = 0; i < json.length; ++i)
+    for (var key in json)
     {
-        let user = json[i];
-        ret[user.username] = {
-            username: user.username,
-            password: user.password,
-            permissions: user.permissions,
-            admin: user.admin
-        };
+        if (json.hasOwnProperty(key))
+        {
+            let user = json[key];
+            ret[user.username] = {
+                username: user.username,
+                password: user.password,
+                permissions: user.permissions,
+                admin: user.admin
+            };
+        }
     }
     return ret;
 }
