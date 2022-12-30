@@ -1,9 +1,9 @@
-var express = require('express'),
-    router = express();
+let express = require('express');
+let router = express();
 
 module.exports = function(sa_app)
 {
-    var api = require('./rest_api')(sa_app);
+    let api = require('./rest_api')(sa_app);
     router.use("/api", api);
 
     router.post("/login", (req, res) => {
@@ -14,7 +14,7 @@ module.exports = function(sa_app)
         {
             console.log("-> Log in post");
         }
-        var ret = sa_app.auth.validate_credentials(username, password);
+        let ret = sa_app.auth.validate_credentials(username, password);
         if (ret.good)
         {
             req.session.user = username;
@@ -41,7 +41,8 @@ module.exports = function(sa_app)
             console.log("-> Log in get");
             console.log("url = " + url)
         }
-        var user = sa_app.session.get_user_session(req);
+
+        let user = sa_app.session.get_user_session(req);
         if (user == undefined)
             res.render("login");
         else
@@ -65,7 +66,7 @@ module.exports = function(sa_app)
     });
 
     router.get("/", (req, res) => {
-        var user = sa_app.session.get_user_session(req);
+        let user = sa_app.session.get_user_session(req);
         if (user == undefined)
             res.redirect("/login");
         else
@@ -77,7 +78,7 @@ module.exports = function(sa_app)
     });
 
     router.get("/admin", (req, res) => {
-        var user = sa_app.session.get_user_session(req);
+        let user = sa_app.session.get_user_session(req);
         if (user == undefined || !sa_app.session.is_admin(user))
             res.redirect("/login");
         else

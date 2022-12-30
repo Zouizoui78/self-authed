@@ -1,23 +1,23 @@
-var express = require('express'),
-    router = express();
+let express = require('express');
+let router = express();
 
 /* Utils */
 
 function not_logged_in(res)
 {
-    var ret = sa_app.tools.result(false, "Not logged in", 11);
+    let ret = sa_app.tools.result(false, "Not logged in", 11);
     res.status(401).send(ret);
 }
 
 function not_admin(res)
 {
-    var ret = sa_app.tools.result(false, "You are not admin", 10);
+    let ret = sa_app.tools.result(false, "You are not admin", 10);
     res.status(401).send(ret);
 }
 
 function get_admin_user(req, res, sa_app)
 {
-    var user = sa_app.session.get_user_session(req);
+    let user = sa_app.session.get_user_session(req);
     if (user)
     {
         if (sa_app.session.is_admin(user))
@@ -36,7 +36,7 @@ function get_admin_user(req, res, sa_app)
 module.exports = function(sa_app)
 {
     router.get("/", (req, res) => {
-        res.send("prout");
+        res.send("nope");
     });
 
     router.get("/permissions", (req, res) => {
@@ -53,7 +53,7 @@ module.exports = function(sa_app)
     });
 
     router.post("/change_password", (req, res) => {
-        var user = sa_app.session.get_user_session(req);
+        let user = sa_app.session.get_user_session(req);
         if (user)
         {
             let username = req.query.username;
@@ -75,7 +75,7 @@ module.exports = function(sa_app)
     /* Admin */
 
     router.get("/users", (req, res) => {
-        var admin = get_admin_user(req, res, sa_app);
+        let admin = get_admin_user(req, res, sa_app);
         if (admin)
         {
             res.setHeader('Content-Type', 'application/json');
@@ -84,7 +84,7 @@ module.exports = function(sa_app)
     });
 
     router.get("/services", (req, res) => {
-        var admin = get_admin_user(req, res, sa_app);
+        let admin = get_admin_user(req, res, sa_app);
         if (admin)
         {
             res.setHeader('Content-Type', 'application/json');
@@ -93,7 +93,7 @@ module.exports = function(sa_app)
     });
 
     router.post("/add_user", (req, res) => {
-        var admin = get_admin_user(req, res, sa_app);
+        let admin = get_admin_user(req, res, sa_app);
         if (admin)
         {
             let username = req.query.username;
@@ -107,7 +107,7 @@ module.exports = function(sa_app)
     });
 
     router.post("/remove_user", (req, res) => {
-        var admin = get_admin_user(req, res, sa_session);
+        let admin = get_admin_user(req, res, sa_session);
         if (admin)
         {
             let username = req.query.username;
@@ -125,7 +125,7 @@ module.exports = function(sa_app)
     });
 
     router.post("/add_service", (req, res) => {
-        var admin = get_admin_user(req, res, sa_session);
+        let admin = get_admin_user(req, res, sa_session);
         if (admin)
         {
             let name = req.query.servicename;
@@ -139,7 +139,7 @@ module.exports = function(sa_app)
     });
 
     router.post("/remove_service", (req, res) => {
-        var admin = get_admin_user(req, res, sa_session);
+        let admin = get_admin_user(req, res, sa_session);
         if (admin)
         {
             let name = req.query.servicename;
@@ -152,7 +152,7 @@ module.exports = function(sa_app)
     });
 
     router.post("/set_permissions", (req, res) => {
-        var admin = get_admin_user(req, res, sa_session);
+        let admin = get_admin_user(req, res, sa_session);
         if (admin)
         {
             let username = req.query.username;

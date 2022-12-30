@@ -1,5 +1,6 @@
 {
-    "debug": false,
+    "dev": true,
+    "debug": true,
     "port": 24080,
     "passwords": "./passwords.json",
     "cookie_domain": ".domain.ovh",

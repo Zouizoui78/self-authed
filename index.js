@@ -18,18 +18,25 @@ if (sa_app.init('./conf.json') == false)
 // Middlewares
 app.use(bodyParser.urlencoded({ extended: false })); // Forms request body parsing
 
-// With this middleware enabled everything stored in req.session is saved across requests
-app.use(session({
+let session_middleware = session({
     name: "session",
-    secret: sa_app.auth.generate_token(20),
+    secret: sa_app.auth.generate_token(100),
     saveUninitialized: false, // true -> deprecated
     resave: false, // true -> deprecated
     cookie: {
         maxAge: 31 * 24 * 3600 * 1000, // Cookie validity in milliseconds
-        domain: sa_app.get_config().cookie_domain,
         httpOnly: true,
     }
-}));
+})
+
+if (sa_app.get_config().dev != true)
+{
+    session_middleware.cookie.domain = sa_app.get_config().cookie_domain;
+    session_middleware.cookie.secure = true; // https
+}
+
+// With this middleware enabled everything stored in req.session is saved across requests
+app.use(session_middleware);
 
 // Rendering engine
 app.set("view engine", "pug");

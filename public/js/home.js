@@ -74,23 +74,20 @@ function password_validate()
 
 function password_error(err)
 {
-    console.log(err);
     var data = JSON.parse(err);
-    console.error(data);
-    /*
-    if (data.code == 1)
-    {
-        _validation_username.innerHTML = data.error;
-        _username.classList.add("is-invalid");
-    }
-    else if (data.code == 2)
-    {
-        _validation_password.innerHTML = data.error;
-        _password.classList.add("is-invalid");
-    }
-    */
+    // if (data.code == 1)
+    // {
+    //     _validation_username.innerHTML = data.error;
+    //     _username.classList.add("is-invalid");
+    // }
+    // else if (data.code == 2)
+    // {
+    //     _validation_password.innerHTML = data.error;
+    //     _password.classList.add("is-invalid");
+    // }
     password_clear_hints();
     _validation_password_repeat.innerHTML = data.error;
+    _password.classList.add("is-invalid");
     _password_repeat.classList.add("is-invalid");
 }
 
