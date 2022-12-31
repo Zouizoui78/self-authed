@@ -4,6 +4,7 @@ let router = express();
 module.exports = function(sa_app)
 {
     let api = require('./rest_api')(sa_app);
+
     router.use("/api", api);
 
     router.post("/login", (req, res) => {

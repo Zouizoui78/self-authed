@@ -36,7 +36,7 @@ function get_admin_user(req, res, sa_app)
 module.exports = function(sa_app)
 {
     router.get("/", (req, res) => {
-        res.send("nope");
+        res.status(400).send("No API there");
     });
 
     router.get("/permissions", (req, res) => {
@@ -81,6 +81,10 @@ module.exports = function(sa_app)
             res.setHeader('Content-Type', 'application/json');
             res.send(JSON.stringify(sa_app.get_users()));
         }
+        else
+        {
+            not_logged_in(res);
+        }
     });
 
     router.get("/services", (req, res) => {
@@ -89,6 +93,10 @@ module.exports = function(sa_app)
         {
             res.setHeader('Content-Type', 'application/json');
             res.send(JSON.stringify(sa_app.get_config().services));
+        }
+        else
+        {
+            not_logged_in(res);
         }
     });
 
@@ -103,6 +111,10 @@ module.exports = function(sa_app)
                 res.status(200).send("Done");
             else
                 res.status(400).send(ret.error);
+        }
+        else
+        {
+            not_logged_in(res);
         }
     });
 
@@ -122,6 +134,10 @@ module.exports = function(sa_app)
                     res.status(400).send(ret.error)
             }
         }
+        else
+        {
+            not_logged_in(res);
+        }
     });
 
     router.post("/add_service", (req, res) => {
@@ -136,6 +152,10 @@ module.exports = function(sa_app)
             else
                 res.status(400).send(ret.error)
         }
+        else
+        {
+            not_logged_in(res);
+        }
     });
 
     router.post("/remove_service", (req, res) => {
@@ -148,6 +168,10 @@ module.exports = function(sa_app)
                 res.status(200).send("Done");
             else
                 res.status(400).send(ret.error)
+        }
+        else
+        {
+            not_logged_in(res);
         }
     });
 
@@ -162,6 +186,10 @@ module.exports = function(sa_app)
                 res.status(200).send("Done");
             else
                 res.status(400).send(ret.error)
+        }
+        else
+        {
+            not_logged_in(res);
         }
     });
 

@@ -1,4 +1,5 @@
 var ajax = {};
+
 ajax.x = function()
 {
     if (typeof XMLHttpRequest !== 'undefined')
@@ -26,10 +27,14 @@ ajax.x = function()
     return xhr;
 };
 
-ajax.send = function (url, method, data, onSuccess, onError, onEnd, async)
+ajax.send = function(url, method, data, onSuccess, onError, onEnd, async)
 {
     if (async === undefined)
         async = true;
+
+    if (url[0] == '/')
+        url = window.location.origin + url;
+
     var x = ajax.x();
     x.open(method, url, async);
     x.onreadystatechange = function()
@@ -62,7 +67,7 @@ ajax.send = function (url, method, data, onSuccess, onError, onEnd, async)
     x.send(data)
 };
 
-ajax.get = function (url, data, onSuccess, onError, onEnd, async)
+ajax.get = function(url, data, onSuccess, onError, onEnd, async)
 {
     var query = [];
     if (data)
@@ -76,7 +81,7 @@ ajax.get = function (url, data, onSuccess, onError, onEnd, async)
                 'GET', null, onSuccess, onError, onEnd, async);
 };
 
-ajax.post = function (url, data, onSuccess, onError, onEnd, async)
+ajax.post = function(url, data, onSuccess, onError, onEnd, async)
 {
     var query = [];
     for (var key in data)
