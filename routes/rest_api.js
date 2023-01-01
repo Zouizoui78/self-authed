@@ -87,6 +87,28 @@ module.exports = function(sa_app)
         }
     });
 
+    router.delete("/users/:user", (req, res) => {
+        let admin = get_admin_user(req, res, sa_app);
+        if (admin)
+        {
+            let username = req.params.user;
+            if (username == admin.username)
+                res.status(400).send("You cannot remove yourself");
+            else
+            {
+                let ret = sa_app.api.remove_user(username);
+                if (ret.good)
+                    res.status(200).send("Done");
+                else
+                    res.status(400).send(ret.error)
+            }
+        }
+        else
+        {
+            not_logged_in(res);
+        }
+    });
+
     router.get("/services", (req, res) => {
         let admin = get_admin_user(req, res, sa_app);
         if (admin)
@@ -111,28 +133,6 @@ module.exports = function(sa_app)
                 res.status(200).send("Done");
             else
                 res.status(400).send(ret.error);
-        }
-        else
-        {
-            not_logged_in(res);
-        }
-    });
-
-    router.delete("/remove_user/:user", (req, res) => {
-        let admin = get_admin_user(req, res, sa_app);
-        if (admin)
-        {
-            let username = req.params.user;
-            if (username == admin.username)
-                res.status(400).send("You cannot remove yourself");
-            else
-            {
-                let ret = sa_app.api.remove_user(username);
-                if (ret.good)
-                    res.status(200).send("Done");
-                else
-                    res.status(400).send(ret.error)
-            }
         }
         else
         {

@@ -86,7 +86,7 @@ function remove_user_error(err)
 function remove_user(username)
 {
     ajax.delete(
-        `/api/remove_user/${username}`,
+        `/api/users/${username}`,
         load_users,
         load_users_err
     );
