@@ -56,7 +56,7 @@ module.exports = function(sa_app)
         let user = sa_app.session.get_user_session(req);
         if (user)
         {
-            let username = req.query.username;
+            let username = req.body.username;
             if (!username || sa_app.session.is_admin(user) == false)
                 username = user.username;
             let password = req.body.password;
@@ -104,8 +104,8 @@ module.exports = function(sa_app)
         let admin = get_admin_user(req, res, sa_app);
         if (admin)
         {
-            let username = req.query.username;
-            let password = req.query.password;
+            let username = req.body.username;
+            let password = req.body.password;
             let ret = sa_app.api.add_user(username, password);
             if (ret.good)
                 res.status(200).send("Done");
@@ -119,10 +119,10 @@ module.exports = function(sa_app)
     });
 
     router.post("/remove_user", (req, res) => {
-        let admin = get_admin_user(req, res, sa_session);
+        let admin = get_admin_user(req, res, sa_app);
         if (admin)
         {
-            let username = req.query.username;
+            let username = req.body.username;
             if (username == admin.username)
                 res.status(400).send("You cannot remove yourself");
             else
@@ -141,11 +141,11 @@ module.exports = function(sa_app)
     });
 
     router.post("/add_service", (req, res) => {
-        let admin = get_admin_user(req, res, sa_session);
+        let admin = get_admin_user(req, res, sa_app);
         if (admin)
         {
-            let name = req.query.servicename;
-            let url = req.query.serviceurl;
+            let name = req.body.servicename;
+            let url = req.body.serviceurl;
             let ret = sa_app.api.add_service(name, url);
             if (ret.good)
                 res.status(200).send("Done");
@@ -159,10 +159,10 @@ module.exports = function(sa_app)
     });
 
     router.post("/remove_service", (req, res) => {
-        let admin = get_admin_user(req, res, sa_session);
+        let admin = get_admin_user(req, res, sa_app);
         if (admin)
         {
-            let name = req.query.servicename;
+            let name = req.body.servicename;
             let ret = sa_app.api.remove_service(name);
             if (ret.good)
                 res.status(200).send("Done");
@@ -176,12 +176,12 @@ module.exports = function(sa_app)
     });
 
     router.post("/set_permissions", (req, res) => {
-        let admin = get_admin_user(req, res, sa_session);
+        let admin = get_admin_user(req, res, sa_app);
         if (admin)
         {
-            let username = req.query.username;
-            let permissions = req.query.permissions;
-            let ret = sa_app.api.set_permissions(username, permissions);
+            let username = req.body.username;
+            let permissions = req.body.permissions;
+            let ret = sa_app.api.set_permissions(username, permissions.split(","));
             if (ret.good)
                 res.status(200).send("Done");
             else

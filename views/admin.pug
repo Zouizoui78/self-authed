@@ -26,61 +26,56 @@ block content
                             div(class="card-body")
                                 div(class="card-title") Users
                                 div(class='container')
-                                    form(action="/new_user", method="post")
-                                        div(class="mb-3")
-                                            label(for="new-user-name" class="form-label") Username
-                                            input(id="new-user-name" type="text" class="form-control" name="new-user-name"
-                                                    aria-describedby="login-help" placeholder="Enter login")
-                                        div(class="mb-3")
-                                            label(for="new-user-password" class="form-label") Password
-                                            input(id="new-user-password" type="password" class="form-control" name="new-user-password"
-                                                    placeholder="Enter password")
-                                        button(id="new-user-validation-btn" type="submit" class="btn btn-primary") Add user
+                                    div(class="mb-3")
+                                        label(for="new-user-name" class="form-label") Username
+                                        input(id="new-user-name" type="text" class="form-control" name="new-user-name"
+                                            aria-describedby="login-help" placeholder="Enter login")
+                                    div(class="mb-3")
+                                        label(for="new-user-password" class="form-label") Password
+                                        input(id="new-user-password" type="password" class="form-control" name="new-user-password"
+                                            placeholder="Enter password")
+                                    button(id="new-user-validation-btn" class="btn btn-primary") Add user
                         div(class="col-lg-6 col-md-12")
                             div(class="card-body")
                                 div(class="card-title") Permissions
                                 div(class='container')
-                                    form(action="/set_user_service", method="post")
-                                        div(class="mb-3")
-                                            label(for="permissions-user-name" class="form-label") Username
-                                            input(id="permissions-user-name" type="text" class="form-control" name="permissions-user-name"
-                                                    aria-describedby="permissions-user-name-help" placeholder="Enter user name")
-                                        div(class="mb-3")
-                                            label(for="permissions-services-names" class="form-label") Permissions
-                                            input(id="permissions-services-names" type="text" class="form-control" name="permissions-services-names"
-                                                    placeholder="Enter comma separated services")
-                                        button(id="permissions-validation-btn" type="submit" class="btn btn-primary") Set permissions
+                                    div(class="mb-3")
+                                        label(for="permissions-user-name" class="form-label") Username
+                                        input(id="permissions-user-name" type="text" class="form-control" name="permissions-user-name"
+                                                aria-describedby="permissions-user-name-help" placeholder="Enter user name")
+                                    div(class="mb-3")
+                                        label(for="permissions-services-names" class="form-label") Permissions
+                                        input(id="permissions-services-names" type="text" class="form-control" name="permissions-services-names"
+                                                placeholder="Enter comma separated services")
+                                    button(id="permissions-validation-btn" class="btn btn-primary") Set permissions
                         div(class="col-lg-6 col-md-12")
                             div(class="card-body")
                                 div(class="card-title") Services
                                 div(class='container')
-                                    form(action="/new_service", method="post")
-                                        div(class="mb-3")
-                                            label(for="new-service-name" class="form-label") Name
-                                            input(id="new-service-name" type="text" class="form-control" name="new-service-name"
-                                                    aria-describedby="new-service-name-help" placeholder="Enter service name")
-                                        div(class="mb-3")
-                                            label(for="new-service-url" class="form-label") URL
-                                            input(id="new-service-url" type="text" class="form-control" name="new-service-url"
-                                                    placeholder="Enter service URL")
-                                        button(id="new-service-validation-btn", type="submit" class="btn btn-primary") Add service
+                                    div(class="mb-3")
+                                        label(for="new-service-name" class="form-label") Name
+                                        input(id="new-service-name" type="text" class="form-control" name="new-service-name"
+                                                aria-describedby="new-service-name-help" placeholder="Enter service name")
+                                    div(class="mb-3")
+                                        label(for="new-service-url" class="form-label") URL
+                                        input(id="new-service-url" type="text" class="form-control" name="new-service-url"
+                                                placeholder="Enter service URL")
+                                    button(id="new-service-validation-btn", class="btn btn-primary") Add service
                         div(class="col-lg-6 col-md-12")
                             div(class="card-body")
                                 div(class="card-title") Remove
                                 div(class='container')
-                                    form(action="/remove_user", method="post")
-                                        div(class="mb-3")
-                                            label(for="remove-user-name" class="form-label") User
-                                            input(id="remove-user-name" type="text" class="form-control" name="remove-user-name"
-                                                    aria-describedby="remove-user-name-help" placeholder="Enter user name")
-                                        button(id="remove-user-validation-btn" type="submit" class="btn btn-primary") Remove user
+                                    div(class="mb-3")
+                                        label(for="remove-user-name" class="form-label") User
+                                        input(id="remove-user-name" type="text" class="form-control" name="remove-user-name"
+                                                aria-describedby="remove-user-name-help" placeholder="Enter user name")
+                                    button(id="remove-user-validation-btn" class="btn btn-primary") Remove user
                                 div(class='container')
-                                    form(action="/remove_service", method="post")
-                                        div(class="mb-3")
-                                            label(for="remove-service-name" class="form-label") Service
-                                            input(id="remove-service-name" type="text" class="form-control" name="remove-service-name"
-                                                    aria-describedby="remove-service-name-help" placeholder="Enter service name")
-                                        button(id="remove-service-validation-btn" type="submit" class="btn btn-primary") Remove service
+                                    div(class="mb-3")
+                                        label(for="remove-service-name" class="form-label") Service
+                                        input(id="remove-service-name" type="text" class="form-control" name="remove-service-name"
+                                                aria-describedby="remove-service-name-help" placeholder="Enter service name")
+                                    button(id="remove-service-validation-btn" class="btn btn-primary") Remove service
         div(class="col-lg-6 col-md-12")
             div(class='container')
                 div(class="card")

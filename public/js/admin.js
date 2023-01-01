@@ -73,8 +73,8 @@ function add_service()
         return ;
     loading_add();
     ajax.post("/api/add_service", {
-        name: _add_service.name.value,
-        url: _add_service.url.value,
+        servicename: _add_service.name.value,
+        serviceurl: _add_service.url.value,
     },
     add_service_validate,
     add_service_error,
@@ -122,7 +122,7 @@ function remove_service()
         return ;
     loading_add();
     ajax.post("/api/remove_service", {
-        username: _remove.service.value,
+        servicename: _remove.service.value,
     },
     remove_service_validate,
     remove_service_error,
