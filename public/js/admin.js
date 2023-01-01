@@ -12,8 +12,7 @@ function add_user_validate()
 
 function add_user_error(err)
 {
-    var data = JSON.parse(err);
-    console.error("User not added: " + data.error)
+    console.error("User not added: " + err)
 }
 
 function add_user()
@@ -24,7 +23,8 @@ function add_user()
     ajax.post("/api/add_user", {
         username: _add_user.username.value,
         password: _add_user.password.value,
-    }, add_user_validate,
+    },
+    add_user_validate,
     add_user_error,
     loading_remove);
 }
@@ -38,8 +38,7 @@ function set_permissions_validate()
 
 function set_permissions_error(err)
 {
-    var data = JSON.parse(err);
-    console.error("User permissions not changed: " + data.error)
+    console.error("User permissions not changed: " + err)
 }
 
 function set_permissions()
@@ -50,7 +49,8 @@ function set_permissions()
     ajax.post("/api/set_permissions", {
         username: _permissions.username.value,
         permissions: _permissions.list.value,
-    }, set_permissions_validate,
+    },
+    set_permissions_validate,
     set_permissions_error,
     loading_remove);
 }
@@ -64,8 +64,7 @@ function add_service_validate()
 
 function add_service_error(err)
 {
-    var data = JSON.parse(err);
-    console.error("Service not added: " + data.error)
+    console.error("Service not added: " + err)
 }
 
 function add_service()
@@ -76,7 +75,8 @@ function add_service()
     ajax.post("/api/add_service", {
         name: _add_service.name.value,
         url: _add_service.url.value,
-    }, add_service_validate,
+    },
+    add_service_validate,
     add_service_error,
     loading_remove);
 }
@@ -89,8 +89,7 @@ function remove_user_validate()
 
 function remove_user_error(err)
 {
-    var data = JSON.parse(err);
-    console.error("User not removed: " + data.error)
+    console.error("User not removed: " + err)
 }
 
 function remove_user()
@@ -100,7 +99,8 @@ function remove_user()
     loading_add();
     ajax.post("/api/remove_user", {
         username: _remove.username.value,
-    }, remove_user_validate,
+    },
+    remove_user_validate,
     remove_user_error,
     loading_remove);
 }
@@ -113,8 +113,7 @@ function remove_service_validate()
 
 function remove_service_error(err)
 {
-    var data = JSON.parse(err);
-    console.error("Service not removed: " + data.error)
+    console.error("Service not removed: " + err)
 }
 
 function remove_service()
@@ -124,7 +123,8 @@ function remove_service()
     loading_add();
     ajax.post("/api/remove_service", {
         username: _remove.service.value,
-    }, remove_service_validate,
+    },
+    remove_service_validate,
     remove_service_error,
     loading_remove);
 }

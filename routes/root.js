@@ -86,7 +86,7 @@ module.exports = function(sa_app)
             res.render('admin', {
                 username: user.username,
                 users: sa_app.get_users()
-            })
+            });
     });
 
     return router;
