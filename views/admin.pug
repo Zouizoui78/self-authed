@@ -4,40 +4,41 @@ block append scripts
     script(src="js/admin.js")
 
 block content
-    div(class="row" style="margin-top: 20px")
-        div(class="col-lg-3 col-md-2")
-        div(class="col-lg-6 col-md-8")
-            div(class='container')
-                div(class="card")
-                    div(class="card-header bg-primary text-white text-center")
+    .row.justify-content-center(style="margin-top: 20px")
+        .col-lg-6.col-md-8
+            .container
+                .card
+                    .card-header.bg-primary.text-white.text-center
                         h2 Self-Authed
-                    div(class="card-body")
+                    .card-body
                         p(class="card-text") Hello #{username} !
-                    div(class="card-footer")
+                    .card-footer
                         a(href="/" class="btn btn-primary" role="button") Back
-    div(class="row" style="margin-top: 20px")
-        div(class="col-lg-12 col-md-12")
-            div(class='container')
-                div(class=" text-center")
+    .row(style="margin-top: 20px")
+        .col
+            .container
+                div.text-center
                     h2 Users
-                table(class="table align-middle")
-                    tr
-                        th(style="width:20%") User
-                        th(style="width:10%" class="text-center") Admin
-                        th(style="width:55%") Permissions
-                        th(style="width:15%" class="text-end")
-                            button(class="btn btn-success btn-sm fa fa-plus")
-                    for user in users
+                table.table
+                    thead
                         tr
-                            td= user.username
-                            td(class="text-center")
-                                if user.admin
-                                    span(class="fa fa-check")
-                            td
-                                for perm in user.permissions.sort()
-                                    span(class="badge bg-primary") #{perm}
-                                    span 
-                            td(class="text-end")
-                                button(class="btn btn-secondary btn-sm fa fa-edit")
-                                span 
-                                button(class="btn btn-danger btn-sm fa fa-trash")
+                            th(style="width:20%") User
+                            th.text-center(style="width:10%") Admin
+                            th(style="width:55%") Permissions
+                            th.text-end(style="width:15%")
+                                button.btn.btn-success.btn-sm.fa.fa-plus(data-bs-toggle="modal" data-bs-target="#edit-modal")
+                    tbody(id="user-table-body")
+    #edit-modal.modal.fade(tabindex="-1")
+        .modal-dialog.modal-dialog-centered
+            .modal-content
+                .modal-header
+                    h5 Edit user
+                .modal-body
+                    input.form-control.mb-3(type="text" placeholder="Username" id="edit-user-name")
+                    input.form-control.mb-3(type="password" placeholder="Password" id="edit-user-password")
+                    .form-check.mb-3
+                        input.form-check-input(type="checkbox" id="edit-user-is-admin")
+                        label.form-check-label(for="is-admin") Admin
+                .modal-footer
+                    button.btn.btn-secondary(type="button" data-bs-dismiss="modal" id="edit-user-cancel-btn") Cancel
+                    button.btn.btn-primary(type="button" data-bs-dismiss="modal" id="edit-user-save-btn") Save

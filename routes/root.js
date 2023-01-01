@@ -32,7 +32,7 @@ module.exports = function(sa_app)
         req.session.destroy(function(err)
         {
             res.redirect("/login");
-        })
+        });
     });
 
     router.get("/login", (req, res) => {

@@ -23,14 +23,12 @@ function load_user_permissions()
 {
     if (!_list)
         return ;
-    loading_add();
     ajax.get("/api/permissions", null,
         update_user_permissions,
         function(err)
         {
             console.error(err);
-        },
-        loading_remove);
+        });
 }
 
 function password_check_same()
@@ -97,29 +95,27 @@ function password_change()
         || !_password_repeat || !_validation_password_repeat
         || !_valid_change)
         return ;
-    loading_add();
     if (password_check_same())
     {
         ajax.post("/api/change_password", {
             password: _password.value,
         }, password_validate,
-        password_error,
-        loading_remove);
+        password_error);
     }
 }
 
 document.addEventListener("DOMContentLoaded", function(event)
 {
     console.log("Home loaded");
-    _list = get_doc_id("permissions");
-    _password = get_doc_id("password");
-    _validation_password = get_doc_id("validation-password");
-    _password_repeat = get_doc_id("password-repeat");
-    _validation_password_repeat = get_doc_id("validation-password-repeat");
-    _valid_change = get_doc_id("valid-change");
-    var change_password_btn = get_doc_id("change-password-btn");
+    _list = get_dom_node_by_id("permissions");
+    _password = get_dom_node_by_id("password");
+    _validation_password = get_dom_node_by_id("validation-password");
+    _password_repeat = get_dom_node_by_id("password-repeat");
+    _validation_password_repeat = get_dom_node_by_id("validation-password-repeat");
+    _valid_change = get_dom_node_by_id("valid-change");
+    var change_password_btn = get_dom_node_by_id("change-password-btn");
     if (change_password_btn)
         change_password_btn.addEventListener("click", password_change);
     load_user_permissions();
-    forms_add_validation();
+    //forms_add_validation();
 });

@@ -118,11 +118,11 @@ module.exports = function(sa_app)
         }
     });
 
-    router.post("/remove_user", (req, res) => {
+    router.delete("/remove_user/:user", (req, res) => {
         let admin = get_admin_user(req, res, sa_app);
         if (admin)
         {
-            let username = req.body.username;
+            let username = req.params.user;
             if (username == admin.username)
                 res.status(400).send("You cannot remove yourself");
             else
