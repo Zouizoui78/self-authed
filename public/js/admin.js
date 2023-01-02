@@ -118,9 +118,10 @@ function user_table_new_row(user)
     new_row.appendChild(admin);
 
     let perms = document.createElement("td");
-    for (let i = 0 ; i < user.permissions.length ; i++)
+    for (i in user.permissions.sort())
     {
-        perms.innerHTML += `<span class='badge bg-primary'>${user.permissions[i]}</span><span> </span>`;
+        let perm = user.permissions[i];
+        perms.innerHTML += `<span class='badge bg-primary'>${perm}</span><span> </span>`;
     }
     new_row.appendChild(perms);
 
@@ -168,8 +169,10 @@ function load_user_table(res, req)
 
     remove_dom_node_children(table_body);
 
-    for (key in users)
+    let keys = Object.keys(users).sort();
+    for (i in keys)
     {
+        let key = keys[i];
         let new_row = user_table_new_row(users[key]);
         table_body.appendChild(new_row);
     }
