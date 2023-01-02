@@ -76,18 +76,17 @@ module.exports = function(sa_app)
 
     router.get("/users", (req, res) => {
         let admin = get_admin_user(req, res, sa_app);
-        if (admin)
-        {
-            res.setHeader('Content-Type', 'application/json');
-            res.send(JSON.stringify(sa_app.get_users()));
-        }
-        else
+        if (!admin)
         {
             not_logged_in(res);
+            return;
         }
+
+        res.setHeader('Content-Type', 'application/json');
+        res.send(JSON.stringify(sa_app.get_users()));
     });
 
-    router.post("/users/:user", (req, res) => {
+    router.post("/users/:username", (req, res) => {
         let admin = get_admin_user(req, res, sa_app);
         if (!admin)
         {
@@ -95,36 +94,46 @@ module.exports = function(sa_app)
             return;
         }
 
-        let username = req.params.user;
-        let password = req.body.password;
-        let is_admin = req.body.admin;
-
-        let ret = sa_app.api.add_user(username, password);
+        let ret = sa_app.api.add_user(req.body);
         if (ret.good)
             res.status(200).send("Done");
         else
             res.status(400).send(ret.error);
     });
 
-    router.delete("/users/:user", (req, res) => {
+    router.put("/users/:username", (req, res) => {
         let admin = get_admin_user(req, res, sa_app);
-        if (admin)
-        {
-            let username = req.params.user;
-            if (username == admin.username)
-                res.status(400).send("You cannot remove yourself");
-            else
-            {
-                let ret = sa_app.api.remove_user(username);
-                if (ret.good)
-                    res.status(200).send("Done");
-                else
-                    res.status(400).send(ret.error)
-            }
-        }
-        else
+        if (!admin)
         {
             not_logged_in(res);
+            return;
+        }
+
+        let ret = sa_app.api.update_user(req.params.username, req.body);
+        if (ret.good)
+            res.status(200).send("Done");
+        else
+            res.status(400).send(ret.error);
+    });
+
+    router.delete("/users/:username", (req, res) => {
+        let admin = get_admin_user(req, res, sa_app);
+        if (!admin)
+        {
+            not_logged_in(res);
+            return;
+        }
+
+        let username = req.params.username;
+        if (username == admin.username)
+            res.status(400).send("You cannot remove yourself");
+        else
+        {
+            let ret = sa_app.api.remove_user(username);
+            if (ret.good)
+                res.status(200).send("Done");
+            else
+                res.status(400).send(ret.error)
         }
     });
 
@@ -134,24 +143,6 @@ module.exports = function(sa_app)
         {
             res.setHeader('Content-Type', 'application/json');
             res.send(JSON.stringify(sa_app.get_config().services));
-        }
-        else
-        {
-            not_logged_in(res);
-        }
-    });
-
-    router.post("/add_user", (req, res) => {
-        let admin = get_admin_user(req, res, sa_app);
-        if (admin)
-        {
-            let username = req.body.username;
-            let password = req.body.password;
-            let ret = sa_app.api.add_user(username, password);
-            if (ret.good)
-                res.status(200).send("Done");
-            else
-                res.status(400).send(ret.error);
         }
         else
         {

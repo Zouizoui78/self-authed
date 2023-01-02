@@ -49,24 +49,24 @@ function add_service()
     add_service_error);
 }
 
-function remove_user_validate()
+function remove_user(username)
 {
-    console.log("User removed: " +  _remove.username.value);
-    _remove.username.value = "";
+    ajax.delete(
+        `/api/users/${username}`,
+        remove_user_success,
+        remove_user_error
+    );
+}
+
+function remove_user_success(res, req)
+{
+    console.log("User removed: " + req.responseURL);
+    load_users();
 }
 
 function remove_user_error(err)
 {
     console.error("User not removed: " + err)
-}
-
-function remove_user(username)
-{
-    ajax.delete(
-        `/api/users/${username}`,
-        load_users,
-        load_users_err
-    );
 }
 
 function remove_service_validate()
@@ -111,7 +111,7 @@ function user_table_new_row(user)
 
     let admin = document.createElement("td");
     admin.classList.add("text-center");
-    if (user.admin)
+    if (user.admin && user.admin === true)
     {
         admin.innerHTML = "<span class='fa fa-check'></span>";
     }
@@ -193,7 +193,7 @@ function modal_reset()
 function modal_load_user(user)
 {
     console.log(`Loading user ${user.username} in modal`);
-    _modal_dom.title.textContent = `Edit user '${user.username}'`;
+    _modal_dom.title.textContent = `${user.username}`;
     _modal_dom.username.value = user.username;
     _modal_dom.is_admin.checked = user.admin;
 }
@@ -203,7 +203,8 @@ function modal_get_user()
     let user = {
         username: _modal_dom.username.value,
         password: _modal_dom.password.value,
-        admin: _modal_dom.is_admin.checked
+        admin: _modal_dom.is_admin.checked,
+        permissions: [ "placeholder" ]
     };
     return user;
 }
@@ -211,29 +212,25 @@ function modal_get_user()
 function modal_save_user()
 {
     let user = modal_get_user();
+    let method = _modal_dom.new_user ? ajax.post : ajax.put;
 
-    if (_modal_dom.new_user)
-    {
-        ajax.post("/api/users/" + user.username,
-        {
-            password: user.password,
-            admin: user.admin
-        },
-        add_user_success,
-        add_user_error);
-    }
+    method(
+        "/api/users/" + _modal_dom.title.textContent,
+        user,
+        modal_save_user_success,
+        modal_save_user_error
+    );
 }
 
-function add_user_success()
+function modal_save_user_success()
 {
-    console.log("Successfully created user " + _modal_dom.username.value);
     _modal_bs.hide();
     load_users();
 }
 
-function add_user_error(err)
+function modal_save_user_error(err)
 {
-    console.error("Failed to create user : " + err);
+    console.error(err);
 }
 
 document.addEventListener("DOMContentLoaded", function(event)

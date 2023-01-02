@@ -41,25 +41,45 @@ function change_password(username, password)
     return _app.tools.result(false, "No such user", 3);
 }
 
-function add_user(username, password)
+function set_user(username, new_user, overwrite = true)
 {
-    var users = _app.get_users();
-    var user = users[username];
-    if (!user)
+    let users = _app.get_users();
+
+    if (!overwrite && users[username])
     {
-        var ret = _verif_password(password);
-        if (ret.good == true)
-        {
-            users[username] = {
-                username: username,
-                password: _app.auth.hash(password),
-                permissions: [],
-            }
-            _app.write_users();
-        }
-        return ret;
+        return _app.tools.result(false, `User '${username}' already exists`, 3);
     }
-    return _app.tools.result(false, `User '${username}' already exists`, 3);
+    else if (users[new_user.username])
+    {
+        return _app.tools.result(false, `User '${new_user.username}' already exists`, 3);
+    }
+
+    if (new_user.password)
+    {
+        let pasword_check = _verif_password(new_user.password);
+        if (!pasword_check.good)
+            return pasword_check;
+        new_user.password = _app.auth.hash(new_user.password);
+    }
+    else
+    {
+        new_user.password = users[username].password;
+    }
+
+    delete users[username];
+    users[new_user.username] = new_user;
+    _app.write_users();
+    return _app.tools.result(true);
+}
+
+function add_user(new_user)
+{
+    return set_user(new_user.username, new_user, false);
+}
+
+function update_user(username, new_user)
+{
+    return set_user(username, new_user, true);
 }
 
 function remove_user(username)
@@ -166,7 +186,9 @@ module.exports = {
     init: init,
     add_service: add_service,
     remove_service: remove_service,
+    set_user: set_user,
     add_user: add_user,
+    update_user: update_user,
     remove_user: remove_user,
     change_password: change_password,
     set_permissions: set_permissions,
