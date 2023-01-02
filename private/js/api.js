@@ -59,7 +59,7 @@ function add_user(username, password)
         }
         return ret;
     }
-    return _app.tools.result(false, "User already exist", 3);
+    return _app.tools.result(false, `User '${username}' already exists`, 3);
 }
 
 function remove_user(username)

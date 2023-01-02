@@ -87,6 +87,25 @@ module.exports = function(sa_app)
         }
     });
 
+    router.post("/users/:user", (req, res) => {
+        let admin = get_admin_user(req, res, sa_app);
+        if (!admin)
+        {
+            not_logged_in(res);
+            return;
+        }
+
+        let username = req.params.user;
+        let password = req.body.password;
+        let is_admin = req.body.admin;
+
+        let ret = sa_app.api.add_user(username, password);
+        if (ret.good)
+            res.status(200).send("Done");
+        else
+            res.status(400).send(ret.error);
+    });
+
     router.delete("/users/:user", (req, res) => {
         let admin = get_admin_user(req, res, sa_app);
         if (admin)

@@ -64,7 +64,7 @@ ajax.send = function(url, method, data, onSuccess, onError, onEnd, async)
     };
     if (method == 'POST')
         x.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-    
+
     if (!data)
         data = "";
     x.send(data);

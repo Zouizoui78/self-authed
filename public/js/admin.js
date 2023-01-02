@@ -1,28 +1,5 @@
-let _modal = {}
-
-function add_user_validate()
-{
-    console.log("User added: " + _add_user.username.value);
-    _add_user.username.value = "";
-    _add_user.password.value = "";
-}
-
-function add_user_error(err)
-{
-    console.error("User not added: " + err)
-}
-
-function add_user()
-{
-    if (!_add_user.username || !_add_user.password)
-        return ;
-    ajax.post("/api/add_user", {
-        username: _add_user.username.value,
-        password: _add_user.password.value,
-    },
-    add_user_validate,
-    add_user_error);
-}
+let _modal_dom = {}
+let _modal_bs = {};
 
 function set_permissions_validate()
 {
@@ -149,18 +126,28 @@ function user_table_new_row(user)
 
     let buttons = document.createElement("td");
     buttons.classList.add("text-end");
-    let edit_button = document.createElement("button");
-    edit_button.classList = "btn btn-secondary btn-sm fa fa-edit";
-    let remove_button = document.createElement("button");
-    remove_button.classList = "btn btn-danger btn-sm fa fa-trash";
+
+    let edit_btn = document.createElement("button");
+    edit_btn.classList = "btn btn-secondary btn-sm fa fa-edit";
+    edit_btn.setAttribute("data-bs-toggle", "modal");
+    edit_btn.setAttribute("data-bs-target", "#edit-modal");
+
+    let remove_btn = document.createElement("button");
+    remove_btn.classList = "btn btn-danger btn-sm fa fa-trash";
+
     let space = document.createElement("span");
     space.textContent = " ";
-    buttons.appendChild(edit_button);
+
+    buttons.appendChild(edit_btn);
     buttons.appendChild(space);
-    buttons.appendChild(remove_button);
+    buttons.appendChild(remove_btn);
     new_row.appendChild(buttons);
 
-    remove_button.addEventListener("click", () => {
+    edit_btn.addEventListener("click", () => {
+        modal_load_user(user);
+    });
+
+    remove_btn.addEventListener("click", () => {
         remove_user(user.username);
     });
 
@@ -193,42 +180,85 @@ function load_users_err(err)
     console.error(err);
 }
 
-function modal_init()
+function modal_reset()
 {
-    _modal.username.value = "";
-    _modal.password.value = "";
-    _modal.is_admin.checked = false;
+    console.log("Modal reset");
+    _modal_dom.title.textContent = "TITLE PLACEHOLDER";
+    _modal_dom.new_user = false;
+    _modal_dom.username.value = "";
+    _modal_dom.password.value = "";
+    _modal_dom.is_admin.checked = false;
 }
 
 function modal_load_user(user)
 {
-    _modal.username.validate = user.username;
-    _modal.password.value = user.password;
-    _modal.is_admin.checked = user.admin;
+    console.log(`Loading user ${user.username} in modal`);
+    _modal_dom.title.textContent = `Edit user '${user.username}'`;
+    _modal_dom.username.value = user.username;
+    _modal_dom.is_admin.checked = user.admin;
 }
 
 function modal_get_user()
 {
-    console.log("Not implemented");
+    let user = {
+        username: _modal_dom.username.value,
+        password: _modal_dom.password.value,
+        admin: _modal_dom.is_admin.checked
+    };
+    return user;
 }
 
 function modal_save_user()
 {
-    console.log("Not implemented");
+    let user = modal_get_user();
+
+    if (_modal_dom.new_user)
+    {
+        ajax.post("/api/users/" + user.username,
+        {
+            password: user.password,
+            admin: user.admin
+        },
+        add_user_success,
+        add_user_error);
+    }
+}
+
+function add_user_success()
+{
+    console.log("Successfully created user " + _modal_dom.username.value);
+    _modal_bs.hide();
+    load_users();
+}
+
+function add_user_error(err)
+{
+    console.error("Failed to create user : " + err);
 }
 
 document.addEventListener("DOMContentLoaded", function(event)
 {
     load_users();
-    _modal.username = get_dom_node_by_id("edit-user-name");
-    _modal.password = get_dom_node_by_id("edit-user-password");
-    _modal.is_admin = get_dom_node_by_id("edit-user-is-admin");
-    _modal.save = get_dom_node_by_id("edit-user-save-btn");
-    _modal.cancel = get_dom_node_by_id("edit-user-cancel-btn");
 
-    if (_modal.save)
-        _modal.save.addEventListener("click", modal_save_user);
+    // We use a tmp variale here to avoid overwriting
+    // modal attributes with get_dom_node_by_id
+    let modal_tmp = get_dom_node_by_id("edit-modal");
+    modal_tmp.addEventListener("hidden.bs.modal", modal_reset);
 
-    if (_modal.cancel)
-        _modal.cancel.addEventListener("click", modal_init);
+    _modal_dom.title = get_dom_node_by_id("edit-modal-title");
+    _modal_dom.username = get_dom_node_by_id("edit-user-name");
+    _modal_dom.password = get_dom_node_by_id("edit-user-password");
+    _modal_dom.is_admin = get_dom_node_by_id("edit-user-is-admin");
+
+    _modal_dom.save_btn = get_dom_node_by_id("edit-user-save-btn");
+    _modal_dom.save_btn.addEventListener("click", modal_save_user);
+
+    let add_user_btn = get_dom_node_by_id("add-user-btn");
+    add_user_btn.addEventListener("click", () => {
+        console.log("New user");
+        _modal_dom.title.textContent = "New user";
+        _modal_dom.new_user = true;
+    });
+
+    _modal_bs = new bootstrap.Modal("#edit-modal");
 });
