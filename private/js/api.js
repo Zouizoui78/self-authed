@@ -49,7 +49,7 @@ function set_user(username, new_user, overwrite = true)
     {
         return _app.tools.result(false, `User '${username}' already exists`, 3);
     }
-    else if (users[new_user.username])
+    else if (username != new_user.username && users[new_user.username])
     {
         return _app.tools.result(false, `User '${new_user.username}' already exists`, 3);
     }
