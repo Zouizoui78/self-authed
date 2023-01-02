@@ -1,4 +1,4 @@
-let _modal_dom = {}
+let _modal_dom = {};
 let _modal_bs = {};
 
 function set_permissions_validate()
@@ -117,12 +117,7 @@ function user_table_new_row(user)
     }
     new_row.appendChild(admin);
 
-    let perms = document.createElement("td");
-    for (i in user.permissions.sort())
-    {
-        let perm = user.permissions[i];
-        perms.innerHTML += `<span class='badge bg-primary'>${perm}</span><span> </span>`;
-    }
+    let perms = array_to_pretty_dom_el("td", user.permissions);
     new_row.appendChild(perms);
 
     let buttons = document.createElement("td");

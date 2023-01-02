@@ -2,6 +2,7 @@ extends layout.pug
 
 block append scripts
     script(src="js/home.js")
+    script(src="js/dom.js")
 
 block content
     div(class="row" style="margin-top: 20px")
@@ -37,4 +38,4 @@ block content
                         h2 Permissions
                     div(class="card-body")
                         div(class='container')
-                            ul(id="permissions" class="list-group list-group-flush")
+                            #permissions

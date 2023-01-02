@@ -10,3 +10,25 @@ function remove_dom_node_children(node)
 {
     node.innerHTML = "";
 }
+
+/**
+ * Create a node containing badges listing the elements of the given array.
+ * @param {string} tag Tag of the new container node
+ * @param {Array} strs Array of strings to create spans for
+ * @param {bool} sort Sort the array or not
+ * @returns DOM element of the given tag containing spans for each permissions
+ */
+function array_to_pretty_dom_el(tag, strs, sort = true)
+{
+    if (sort)
+        strs.sort()
+
+    let perms_el = document.createElement(tag);
+    for (i in strs)
+    {
+        let perm = strs[i];
+        perms_el.innerHTML += `<span class='badge bg-primary me-1'>${perm}</span>`;
+    }
+
+    return perms_el;
+}
