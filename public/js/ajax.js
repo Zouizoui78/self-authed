@@ -62,8 +62,8 @@ ajax.send = function(url, method, data, onSuccess, onError, onEnd, async)
                 onEnd(x);
         }
     };
-    if (method == 'POST')
-        x.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+    if (method == 'POST' || method == 'PUT')
+        x.setRequestHeader('Content-type', 'application/json');
 
     if (!data)
         data = "";
@@ -72,26 +72,17 @@ ajax.send = function(url, method, data, onSuccess, onError, onEnd, async)
 
 ajax.get = function(url, data, onSuccess, onError, onEnd, async)
 {
-    var query = [];
-    if (data)
-    {
-        for (var key in data)
-        {
-            query.push(encodeURIComponent(key) + '=' + encodeURIComponent(data[key]));
-        }
-    }
-    ajax.send(url + (query.length ? '?' + query.join('&') : ''),
-                'GET', null, onSuccess, onError, onEnd, async);
+    ajax.send(url, 'GET', null, onSuccess, onError, onEnd, async);
 };
 
 ajax.post = function(url, data, onSuccess, onError, onEnd, async)
 {
-    var query = [];
-    for (var key in data)
-    {
-        query.push(encodeURIComponent(key) + '=' + encodeURIComponent(data[key]));
-    }
-    ajax.send(url, 'POST', query.join('&'), onSuccess, onError, onEnd, async);
+    ajax.send(url, 'POST', JSON.stringify(data), onSuccess, onError, onEnd, async);
+};
+
+ajax.put = function(url, data, onSuccess, onError, onEnd, async)
+{
+    ajax.send(url, 'PUT', JSON.stringify(data), onSuccess, onError, onEnd, async);
 };
 
 ajax.delete = function(url, onSuccess, onError, onEnd, async)

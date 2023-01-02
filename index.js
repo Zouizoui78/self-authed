@@ -2,10 +2,9 @@ process.chdir(__dirname)
 
 const express = require('express');
 
-const app = express()
+const app = express();
 const server = require('http').createServer(app);
 
-var bodyParser = require("body-parser");
 const session = require('express-session');
 
 const sa_app = require("./private/js/app.js");
@@ -16,7 +15,7 @@ if (sa_app.init('./conf.json') == false)
 /* App */
 
 // Middlewares
-app.use(bodyParser.urlencoded({ extended: false })); // Forms request body parsing
+app.use(express.json()); // JSON body parsing
 
 let session_middleware = session({
     name: "session",
