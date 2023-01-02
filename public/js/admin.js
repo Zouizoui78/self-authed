@@ -1,5 +1,10 @@
-let _modal_dom = {};
-let _modal_bs = {};
+let _users = {};
+let _services = {};
+
+let _user_modal = {
+    dom: {},
+    bs: {}
+}
 
 function set_permissions_validate()
 {
@@ -96,10 +101,121 @@ function load_users()
     ajax.get(
         "/api/users",
         null,
-        load_user_table,
+        load_users_success,
         load_users_err
     );
 }
+
+function load_users_success(res, req)
+{
+    if (typeof(res) === "string")
+    {
+        _users = JSON.parse(res);
+    }
+    load_user_table(_users);
+}
+
+function load_user_table(users)
+{
+    let table_body = get_dom_node_by_id("user-table-body");
+    if (!table_body)
+        return;
+
+    remove_dom_node_children(table_body);
+
+    let keys = Object.keys(users).sort();
+    for (i in keys)
+    {
+        let key = keys[i];
+        let new_row = user_table_new_row(users[key]);
+        table_body.appendChild(new_row);
+    }
+}
+
+function load_users_err(err)
+{
+    console.error(err);
+}
+
+function modal_reset()
+{
+    console.log("Modal reset");
+    _user_modal.dom.title.textContent = "TITLE PLACEHOLDER";
+    _user_modal.dom.new_user = false;
+    _user_modal.dom.username.value = "";
+    _user_modal.dom.password.value = "";
+    _user_modal.dom.is_admin.checked = false;
+}
+
+function modal_load_user(user)
+{
+    console.log(`Loading user ${user.username} in modal`);
+    _user_modal.dom.title.textContent = `${user.username}`;
+    _user_modal.dom.username.value = user.username;
+    _user_modal.dom.is_admin.checked = user.admin;
+}
+
+function modal_get_user()
+{
+    let user = {
+        username: _user_modal.dom.username.value,
+        password: _user_modal.dom.password.value,
+        admin: _user_modal.dom.is_admin.checked,
+        permissions: []
+    };
+    return user;
+}
+
+function modal_save_user()
+{
+    let user = modal_get_user();
+    let method = _user_modal.dom.new_user ? ajax.post : ajax.put;
+
+    method(
+        "/api/users/" + _user_modal.dom.title.textContent,
+        user,
+        modal_save_user_success,
+        modal_save_user_error
+    );
+}
+
+function modal_save_user_success()
+{
+    _user_modal.bs.hide();
+    load_users();
+}
+
+function modal_save_user_error(err)
+{
+    console.error(err);
+}
+
+document.addEventListener("DOMContentLoaded", function(event)
+{
+    load_users();
+
+    // We use a tmp variale here to avoid overwriting
+    // modal attributes with get_dom_node_by_id
+    let modal_tmp = get_dom_node_by_id("user-modal");
+    modal_tmp.addEventListener("hidden.bs.modal", modal_reset);
+
+    _user_modal.dom.title = get_dom_node_by_id("user-modal-title");
+    _user_modal.dom.username = get_dom_node_by_id("user-modal-username");
+    _user_modal.dom.password = get_dom_node_by_id("user-modal-password");
+    _user_modal.dom.is_admin = get_dom_node_by_id("user-modal-is-admin");
+
+    _user_modal.dom.save_btn = get_dom_node_by_id("user-modal-save-btn");
+    _user_modal.dom.save_btn.addEventListener("click", modal_save_user);
+
+    let add_user_btn = get_dom_node_by_id("add-user-btn");
+    add_user_btn.addEventListener("click", () => {
+        console.log("New user");
+        _user_modal.dom.title.textContent = "New user";
+        _user_modal.dom.new_user = true;
+    });
+
+    _user_modal.bs = new bootstrap.Modal("#user-modal");
+});
 
 function user_table_new_row(user)
 {
@@ -126,7 +242,7 @@ function user_table_new_row(user)
     let edit_btn = document.createElement("button");
     edit_btn.classList = "btn btn-secondary btn-sm fa fa-edit";
     edit_btn.setAttribute("data-bs-toggle", "modal");
-    edit_btn.setAttribute("data-bs-target", "#edit-modal");
+    edit_btn.setAttribute("data-bs-target", "#user-modal");
 
     let remove_btn = document.createElement("button");
     remove_btn.classList = "btn btn-danger btn-sm fa fa-trash";
@@ -149,111 +265,3 @@ function user_table_new_row(user)
 
     return new_row;
 }
-
-function load_user_table(res, req)
-{
-    let users = {};
-    if (typeof(res) === "string")
-    {
-        users = JSON.parse(res);
-    }
-
-    let table_body = get_dom_node_by_id("user-table-body");
-    if (!table_body)
-        return;
-
-    remove_dom_node_children(table_body);
-
-    let keys = Object.keys(users).sort();
-    for (i in keys)
-    {
-        let key = keys[i];
-        let new_row = user_table_new_row(users[key]);
-        table_body.appendChild(new_row);
-    }
-}
-
-function load_users_err(err)
-{
-    console.error(err);
-}
-
-function modal_reset()
-{
-    console.log("Modal reset");
-    _modal_dom.title.textContent = "TITLE PLACEHOLDER";
-    _modal_dom.new_user = false;
-    _modal_dom.username.value = "";
-    _modal_dom.password.value = "";
-    _modal_dom.is_admin.checked = false;
-}
-
-function modal_load_user(user)
-{
-    console.log(`Loading user ${user.username} in modal`);
-    _modal_dom.title.textContent = `${user.username}`;
-    _modal_dom.username.value = user.username;
-    _modal_dom.is_admin.checked = user.admin;
-}
-
-function modal_get_user()
-{
-    let user = {
-        username: _modal_dom.username.value,
-        password: _modal_dom.password.value,
-        admin: _modal_dom.is_admin.checked,
-        permissions: [ "placeholder" ]
-    };
-    return user;
-}
-
-function modal_save_user()
-{
-    let user = modal_get_user();
-    let method = _modal_dom.new_user ? ajax.post : ajax.put;
-
-    method(
-        "/api/users/" + _modal_dom.title.textContent,
-        user,
-        modal_save_user_success,
-        modal_save_user_error
-    );
-}
-
-function modal_save_user_success()
-{
-    _modal_bs.hide();
-    load_users();
-}
-
-function modal_save_user_error(err)
-{
-    console.error(err);
-}
-
-document.addEventListener("DOMContentLoaded", function(event)
-{
-    load_users();
-
-    // We use a tmp variale here to avoid overwriting
-    // modal attributes with get_dom_node_by_id
-    let modal_tmp = get_dom_node_by_id("edit-modal");
-    modal_tmp.addEventListener("hidden.bs.modal", modal_reset);
-
-    _modal_dom.title = get_dom_node_by_id("edit-modal-title");
-    _modal_dom.username = get_dom_node_by_id("edit-user-name");
-    _modal_dom.password = get_dom_node_by_id("edit-user-password");
-    _modal_dom.is_admin = get_dom_node_by_id("edit-user-is-admin");
-
-    _modal_dom.save_btn = get_dom_node_by_id("edit-user-save-btn");
-    _modal_dom.save_btn.addEventListener("click", modal_save_user);
-
-    let add_user_btn = get_dom_node_by_id("add-user-btn");
-    add_user_btn.addEventListener("click", () => {
-        console.log("New user");
-        _modal_dom.title.textContent = "New user";
-        _modal_dom.new_user = true;
-    });
-
-    _modal_bs = new bootstrap.Modal("#edit-modal");
-});
