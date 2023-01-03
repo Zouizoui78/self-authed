@@ -11,9 +11,9 @@ block content
                     .card-header.bg-primary.text-white.text-center
                         h2 Self-Authed
                     .card-body
-                        p(class="card-text") Hello #{username} !
+                        p.card-text Hello #{username} !
                     .card-footer
-                        a(href="/" class="btn btn-primary" role="button") Back
+                        a.btn.btn-primary(href="/" role="button") Back
     .row(style="margin-top: 20px")
         .col
             .container
@@ -23,22 +23,44 @@ block content
                     thead
                         tr
                             th(style="width:20%") User
-                            th.text-center(style="width:10%") Admin
-                            th(style="width:55%") Permissions
-                            th.text-end(style="width:15%")
+                            th(style="width:5%") Admin
+                            th(style="width:65%") Permissions
+                            th.text-end(style="width:10%")
                                 button#add-user-btn.btn.btn-success.btn-sm.fa.fa-plus(data-bs-toggle="modal" data-bs-target="#user-modal")
-                    tbody(id="user-table-body")
+                    tbody#user-table-body
+                div.text-center
+                    h2 Services
+                table.table.align-middle
+                    thead
+                        tr
+                            th(style="width:15%") Name
+                            th(style="width:25%") Address
+                            th(style="width:50%") Allowed users
+                            th.text-end(style="width:10%")
+                                button#add-service-btn.btn.btn-success.btn-sm.fa.fa-plus(data-bs-toggle="modal" data-bs-target="#service-modal")
+                    tbody#service-table-body
     modal#user-modal.modal.fade(tabindex="-1")
         .modal-dialog.modal-dialog-centered
             .modal-content
                 .modal-header
                     h5#user-modal-title
                 .modal-body
-                    input.form-control.mb-3(type="text" placeholder="Username" id="user-modal-username")
-                    input.form-control.mb-3(type="password" placeholder="Password" id="user-modal-password")
+                    input#user-modal-username.form-control.mb-3(type="text" placeholder="Username")
+                    input#user-modal-password.form-control.mb-3(type="password" placeholder="Password")
                     .form-check.mb-3
-                        input.form-check-input(type="checkbox" id="user-modal-is-admin")
+                        input#user-modal-is-admin.form-check-input(type="checkbox")
                         label.form-check-label(for="is-admin") Admin
                 .modal-footer
-                    button.btn.btn-secondary(type="button" data-bs-dismiss="modal" id="user-modal-cancel-btn") Cancel
-                    button.btn.btn-primary(type="button" id="user-modal-save-btn") Save
+                    button#user-modal-cancel-btn.btn.btn-secondary(type="button" data-bs-dismiss="modal") Cancel
+                    button#user-modal-save-btn.btn.btn-primary(type="button") Save
+    modal#service-modal.modal.fade(tabindex="-1")
+        .modal-dialog.modal-dialog-centered
+            .modal-content
+                .modal-header
+                    h5#service-modal-title
+                .modal-body
+                    input#service-modal-name.form-control.mb-3(type="text" placeholder="Service name")
+                    input#service-modal-addr.form-control.mb-3(type="text" placeholder="Address")
+                .modal-footer
+                    button#service-modal-cancel-btn.btn.btn-secondary(type="button" data-bs-dismiss="modal") Cancel
+                    button#service-modal-save-btn.btn.btn-primary(type="button") Save

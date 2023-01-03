@@ -6,6 +6,11 @@ let _user_modal = {
     bs: {}
 }
 
+let _service_modal = {
+    dom: {},
+    bs: {}
+}
+
 function set_permissions_validate()
 {
     console.log("User permissions changed: " +  _permissions.username.value);
@@ -115,6 +120,11 @@ function load_users_success(res, req)
     load_user_table(_users);
 }
 
+function load_users_err(err)
+{
+    console.error(err);
+}
+
 function load_user_table(users)
 {
     let table_body = get_dom_node_by_id("user-table-body");
@@ -132,30 +142,67 @@ function load_user_table(users)
     }
 }
 
-function load_users_err(err)
+function load_services()
+{
+    ajax.get(
+        "/api/services",
+        null,
+        load_services_success,
+        load_services_err
+    );
+}
+
+function load_services_success(res, req)
+{
+    if (typeof(res) === "string")
+    {
+        _services = JSON.parse(res);
+    }
+
+    load_service_table(_services);
+}
+
+function load_services_err(err)
 {
     console.error(err);
 }
 
-function modal_reset()
+function load_service_table(services)
+{
+    let table_body = get_dom_node_by_id("service-table-body");
+    if (!table_body)
+        return;
+
+    remove_dom_node_children(table_body);
+
+    let keys = Object.keys(services).sort();
+    for (i in keys)
+    {
+        let key = keys[i];
+        let new_row = service_table_new_row(key, services[key]);
+        table_body.appendChild(new_row);
+    }
+}
+
+function user_modal_reset()
 {
     console.log("Modal reset");
     _user_modal.dom.title.textContent = "TITLE PLACEHOLDER";
-    _user_modal.dom.new_user = false;
+    _user_modal.new = false;
     _user_modal.dom.username.value = "";
     _user_modal.dom.password.value = "";
     _user_modal.dom.is_admin.checked = false;
 }
 
-function modal_load_user(user)
+function user_modal_set(user)
 {
-    console.log(`Loading user ${user.username} in modal`);
+    console.log(`Showing user ${user.username} in modal`);
     _user_modal.dom.title.textContent = `${user.username}`;
     _user_modal.dom.username.value = user.username;
     _user_modal.dom.is_admin.checked = user.admin;
 }
 
-function modal_get_user()
+function user_modal_get()
 {
     let user = {
         username: _user_modal.dom.username.value,
@@ -166,26 +213,70 @@ function modal_get_user()
     return user;
 }
 
-function modal_save_user()
+function user_modal_save()
 {
-    let user = modal_get_user();
-    let method = _user_modal.dom.new_user ? ajax.post : ajax.put;
+    let user = user_modal_get();
+    let method = _user_modal.new ? ajax.post : ajax.put;
 
     method(
         "/api/users/" + _user_modal.dom.title.textContent,
         user,
-        modal_save_user_success,
-        modal_save_user_error
+        user_modal_save_success,
+        user_modal_save_error
     );
 }
 
-function modal_save_user_success()
+function user_modal_save_success()
 {
     _user_modal.bs.hide();
     load_users();
 }
 
-function modal_save_user_error(err)
+function user_modal_save_error(err)
+{
+    console.error(err);
+}
+
+function service_modal_reset()
+{
+    console.log("Modal reset");
+    _service_modal.dom.title.textContent = "TITLE PLACEHOLDER";
+    _service_modal.new = false;
+    _service_modal.dom.name.value = "";
+    _service_modal.dom.addr.value = "";
+}
+
+function service_modal_set(name, addr)
+{
+    console.log(`Showing service ${name} in modal`);
+    _service_modal.dom.title.textContent = `${name}`;
+    _service_modal.dom.name.value = name;
+    _service_modal.dom.addr.value = addr;
+}
+
+
+function service_modal_save()
+{
+    let method = _service_modal.new ? ajax.post : ajax.put;
+
+    method(
+        "/api/services/" + _service_modal.dom.title.textContent,
+        [
+            _service_modal.dom.name.value,
+            _service_modal.dom.addr.value
+        ],
+        service_modal_save_success,
+        service_modal_save_error
+    );
+}
+
+function service_modal_save_success()
+{
+    _service_modal.bs.hide();
+    load_services();
+}
+
+function service_modal_save_error(err)
 {
     console.error(err);
 }
@@ -193,11 +284,13 @@ function modal_save_user_error(err)
 document.addEventListener("DOMContentLoaded", function(event)
 {
     load_users();
+    load_services();
 
+    // User modal
     // We use a tmp variale here to avoid overwriting
     // modal attributes with get_dom_node_by_id
-    let modal_tmp = get_dom_node_by_id("user-modal");
-    modal_tmp.addEventListener("hidden.bs.modal", modal_reset);
+    let user_modal_tmp = get_dom_node_by_id("user-modal");
+    user_modal_tmp.addEventListener("hidden.bs.modal", user_modal_reset);
 
     _user_modal.dom.title = get_dom_node_by_id("user-modal-title");
     _user_modal.dom.username = get_dom_node_by_id("user-modal-username");
@@ -205,16 +298,36 @@ document.addEventListener("DOMContentLoaded", function(event)
     _user_modal.dom.is_admin = get_dom_node_by_id("user-modal-is-admin");
 
     _user_modal.dom.save_btn = get_dom_node_by_id("user-modal-save-btn");
-    _user_modal.dom.save_btn.addEventListener("click", modal_save_user);
+    _user_modal.dom.save_btn.addEventListener("click", user_modal_save);
 
     let add_user_btn = get_dom_node_by_id("add-user-btn");
     add_user_btn.addEventListener("click", () => {
         console.log("New user");
         _user_modal.dom.title.textContent = "New user";
-        _user_modal.dom.new_user = true;
+        _user_modal.new = true;
     });
 
     _user_modal.bs = new bootstrap.Modal("#user-modal");
+
+    // Service modal
+    let service_modal_tmp = get_dom_node_by_id("service-modal");
+    service_modal_tmp.addEventListener("hidden.bs.modal", service_modal_reset);
+
+    _service_modal.dom.title = get_dom_node_by_id("service-modal-title");
+    _service_modal.dom.name = get_dom_node_by_id("service-modal-name");
+    _service_modal.dom.addr = get_dom_node_by_id("service-modal-addr");
+
+    _service_modal.dom.save_btn = get_dom_node_by_id("service-modal-save-btn");
+    _service_modal.dom.save_btn.addEventListener("click", service_modal_save);
+
+    let add_service_btn = get_dom_node_by_id("add-service-btn");
+    add_service_btn.addEventListener("click", () => {
+        console.log("New service");
+        _service_modal.dom.title.textContent = "New service";
+        _service_modal.new = true;
+    });
+
+    _service_modal.bs = new bootstrap.Modal("#service-modal");
 });
 
 function user_table_new_row(user)
@@ -256,7 +369,7 @@ function user_table_new_row(user)
     new_row.appendChild(buttons);
 
     edit_btn.addEventListener("click", () => {
-        modal_load_user(user);
+        user_modal_set(user);
     });
 
     remove_btn.addEventListener("click", () => {
@@ -264,4 +377,49 @@ function user_table_new_row(user)
     });
 
     return new_row;
+}
+
+function service_table_new_row(name, addr)
+{
+    let tr = document.createElement("tr");
+
+    let name_td = document.createElement("td");
+    name_td.textContent = name;
+    tr.appendChild(name_td);
+
+    let addr_td = document.createElement("td");
+    addr_td.textContent = addr;
+    tr.appendChild(addr_td);
+
+    let users_td = array_to_pretty_dom_el("td", ["placeholder"]);
+    tr.appendChild(users_td);
+
+    let buttons = document.createElement("td");
+    buttons.classList.add("text-end");
+
+    let edit_btn = document.createElement("button");
+    edit_btn.classList = "btn btn-secondary btn-sm fa fa-edit";
+    edit_btn.setAttribute("data-bs-toggle", "modal");
+    edit_btn.setAttribute("data-bs-target", "#service-modal");
+
+    let remove_btn = document.createElement("button");
+    remove_btn.classList = "btn btn-danger btn-sm fa fa-trash";
+
+    let space = document.createElement("span");
+    space.textContent = " ";
+
+    buttons.appendChild(edit_btn);
+    buttons.appendChild(space);
+    buttons.appendChild(remove_btn);
+    tr.appendChild(buttons);
+
+    edit_btn.addEventListener("click", () => {
+        service_modal_set(name, addr);
+    });
+
+    remove_btn.addEventListener("click", () => {
+        remove_service(name);
+    });
+
+    return tr;
 }
