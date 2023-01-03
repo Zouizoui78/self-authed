@@ -434,7 +434,6 @@ function user_modal_make_permissions_list(services, user)
 
     for (let service of service_list)
     {
-        console.log(service);
         let li = document.createElement("li");
         li.classList = "list-group-item";
 
