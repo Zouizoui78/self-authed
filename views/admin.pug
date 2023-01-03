@@ -46,7 +46,7 @@ block content
                 .modal-header
                     h5#user-modal-title
                 .modal-body
-                    .row.mb-3
+                    .row
                         .col-lg-6.col-md-12
                             h5 User information
                             input#user-modal-username.form-control.mb-3(type="text" placeholder="Username")
@@ -61,7 +61,7 @@ block content
                                 .col.form-check.pull-right
                                     input#user-modal-all-permission.form-check-input(type="checkbox")
                                     label.form-check-label(for="user-modal-all-permission") all
-                            div#user-modal-permissions
+                            div#user-modal-permissions(style="max-height: 50vh; overflow-y: overlay;")
                 .modal-footer
                     button#user-modal-cancel-btn.btn.btn-secondary(type="button" data-bs-dismiss="modal") Cancel
                     button#user-modal-save-btn.btn.btn-primary(type="button") Save
@@ -72,7 +72,7 @@ block content
                     h5#service-modal-title
                 .modal-body
                     input#service-modal-name.form-control.mb-3(type="text" placeholder="Service name")
-                    input#service-modal-url.form-control.mb-3(type="text" placeholder="Address")
+                    input#service-modal-url.form-control(type="text" placeholder="Address")
                 .modal-footer
                     button#service-modal-cancel-btn.btn.btn-secondary(type="button" data-bs-dismiss="modal") Cancel
                     button#service-modal-save-btn.btn.btn-primary(type="button") Save
