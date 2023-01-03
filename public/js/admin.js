@@ -11,30 +11,6 @@ let _service_modal = {
     bs: {}
 }
 
-function set_permissions_validate()
-{
-    console.log("User permissions changed: " +  _permissions.username.value);
-    _permissions.username.value = "";
-    _permissions.list.value = "";
-}
-
-function set_permissions_error(err)
-{
-    console.error("User permissions not changed: " + err)
-}
-
-function set_permissions()
-{
-    if (!_permissions.username || !_permissions.list)
-        return ;
-    ajax.post("/api/set_permissions", {
-        username: _permissions.username.value,
-        permissions: _permissions.list.value,
-    },
-    set_permissions_validate,
-    set_permissions_error);
-}
-
 function remove_user(username)
 {
     ajax.delete(
@@ -146,8 +122,15 @@ function load_services_err(err)
 function load_users_and_services()
 {
     console.log("Loading users and services...");
-    load_users();
-    load_services();
+    ajax.get(
+        "/api/users",
+        null,
+        (res, req) => {
+            load_services();
+            load_users_success(res, req);
+        },
+        load_users_err
+    );
 }
 
 function load_service_table(services)
@@ -381,7 +364,8 @@ function service_table_new_row(name, url)
     url_td.textContent = url;
     tr.appendChild(url_td);
 
-    let users_td = array_to_pretty_dom_el("td", ["placeholder"]);
+    let users_list = list_service_users(_users, name);
+    let users_td = array_to_pretty_dom_el("td", users_list);
     tr.appendChild(users_td);
 
     let buttons = document.createElement("td");

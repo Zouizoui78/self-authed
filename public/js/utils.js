@@ -17,3 +17,31 @@ function forms_add_validation()
         }, false);
     });
 }
+
+function array_equals(arr1, arr2)
+{
+    if (arr1.length != arr2.length)
+        return false;
+
+    for (i in arr1)
+    {
+        if (!arr1.includes(arr2[i]) || !arr2.includes(arr1[i]))
+        return false;
+    }
+    return true;
+}
+
+function list_service_users(users, service_name)
+{
+    let ret = [];
+    for (key in users)
+    {
+        let user = users[key];
+        if (array_equals(user.permissions, ["all"])
+            || user.permissions.includes(service_name))
+        {
+            ret.push(key);
+        }
+    }
+    return ret.sort();
+}
