@@ -35,30 +35,6 @@ function set_permissions()
     set_permissions_error);
 }
 
-function add_service_validate()
-{
-    console.log("Service added: " +  _add_service.name.value);
-    _add_service.name.value = "";
-    _add_service.url.value = "";
-}
-
-function add_service_error(err)
-{
-    console.error("Service not added: " + err)
-}
-
-function add_service()
-{
-    if (!_add_service.name || !_add_service.url)
-        return ;
-    ajax.post("/api/add_service", {
-        servicename: _add_service.name.value,
-        serviceurl: _add_service.url.value,
-    },
-    add_service_validate,
-    add_service_error);
-}
-
 function remove_user(username)
 {
     ajax.delete(
@@ -79,10 +55,10 @@ function remove_user_error(err)
     console.error("User not removed: " + err)
 }
 
-function remove_service_validate()
+function remove_service_success(res, req)
 {
-    console.log("Service removed: " +  _remove.service.value);
-    _remove.service.value = "";
+    console.log("Service removed: " +  req.responseURL);
+    load_users_and_services();
 }
 
 function remove_service_error(err)
@@ -90,13 +66,13 @@ function remove_service_error(err)
     console.error("Service not removed: " + err)
 }
 
-function remove_service(sevice_name)
+function remove_service(service_name)
 {
-    ajax.post("/api/remove_service", {
-        servicename: _remove.service.value,
-    },
-    remove_service_validate,
-    remove_service_error);
+    ajax.delete(
+        `/api/services/${service_name}`,
+        remove_service_success,
+        remove_service_error
+    );
 }
 
 function load_users()
@@ -169,6 +145,7 @@ function load_services_err(err)
 
 function load_users_and_services()
 {
+    console.log("Loading users and services...");
     load_users();
     load_services();
 }
@@ -192,7 +169,7 @@ function load_service_table(services)
 
 function user_modal_reset()
 {
-    console.log("Modal reset");
+    console.log("User modal reset");
     _user_modal.dom.title.textContent = "TITLE PLACEHOLDER";
     _user_modal.new = false;
     _user_modal.dom.username.value = "";
@@ -249,19 +226,19 @@ function user_modal_save_error(err)
 
 function service_modal_reset()
 {
-    console.log("Modal reset");
+    console.log("Service modal reset");
     _service_modal.dom.title.textContent = "TITLE PLACEHOLDER";
     _service_modal.new = false;
     _service_modal.dom.name.value = "";
-    _service_modal.dom.addr.value = "";
+    _service_modal.dom.url.value = "";
 }
 
-function service_modal_set(name, addr)
+function service_modal_set(name, url)
 {
     console.log(`Showing service ${name} in modal`);
     _service_modal.dom.title.textContent = name;
     _service_modal.dom.name.value = name;
-    _service_modal.dom.addr.value = addr;
+    _service_modal.dom.url.value = url;
 }
 
 
@@ -275,10 +252,10 @@ function service_modal_save()
 
     method(
         "/api/services/" + service_name,
-        [
-            _service_modal.dom.name.value,
-            _service_modal.dom.addr.value
-        ],
+        {
+            servicename: _service_modal.dom.name.value,
+            serviceurl: _service_modal.dom.url.value
+        },
         service_modal_save_success,
         service_modal_save_error
     );
@@ -328,7 +305,7 @@ document.addEventListener("DOMContentLoaded", function(event)
 
     _service_modal.dom.title = get_dom_node_by_id("service-modal-title");
     _service_modal.dom.name = get_dom_node_by_id("service-modal-name");
-    _service_modal.dom.addr = get_dom_node_by_id("service-modal-addr");
+    _service_modal.dom.url = get_dom_node_by_id("service-modal-url");
 
     _service_modal.dom.save_btn = get_dom_node_by_id("service-modal-save-btn");
     _service_modal.dom.save_btn.addEventListener("click", service_modal_save);
@@ -392,7 +369,7 @@ function user_table_new_row(user)
     return new_row;
 }
 
-function service_table_new_row(name, addr)
+function service_table_new_row(name, url)
 {
     let tr = document.createElement("tr");
 
@@ -400,9 +377,9 @@ function service_table_new_row(name, addr)
     name_td.textContent = name;
     tr.appendChild(name_td);
 
-    let addr_td = document.createElement("td");
-    addr_td.textContent = addr;
-    tr.appendChild(addr_td);
+    let url_td = document.createElement("td");
+    url_td.textContent = url;
+    tr.appendChild(url_td);
 
     let users_td = array_to_pretty_dom_el("td", ["placeholder"]);
     tr.appendChild(users_td);
@@ -427,7 +404,7 @@ function service_table_new_row(name, addr)
     tr.appendChild(buttons);
 
     edit_btn.addEventListener("click", () => {
-        service_modal_set(name, addr);
+        service_modal_set(name, url);
     });
 
     remove_btn.addEventListener("click", () => {

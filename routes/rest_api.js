@@ -150,39 +150,50 @@ module.exports = function(sa_app)
         }
     });
 
-    router.post("/add_service", (req, res) => {
+    router.post("/services/:service", (req, res) => {
         let admin = get_admin_user(req, res, sa_app);
-        if (admin)
-        {
-            let name = req.body.servicename;
-            let url = req.body.serviceurl;
-            let ret = sa_app.api.add_service(name, url);
-            if (ret.good)
-                res.status(200).send("Done");
-            else
-                res.status(400).send(ret.error)
-        }
-        else
+        if (!admin)
         {
             not_logged_in(res);
+            return;
         }
+
+        let ret = sa_app.api.add_service(req.body);
+        if (ret.good)
+            res.status(200).send("Done");
+        else
+            res.status(400).send(ret.error);
     });
 
-    router.post("/remove_service", (req, res) => {
+    router.put("/services/:service", (req, res) => {
         let admin = get_admin_user(req, res, sa_app);
-        if (admin)
-        {
-            let name = req.body.servicename;
-            let ret = sa_app.api.remove_service(name);
-            if (ret.good)
-                res.status(200).send("Done");
-            else
-                res.status(400).send(ret.error)
-        }
-        else
+        if (!admin)
         {
             not_logged_in(res);
+            return;
         }
+
+        let ret = sa_app.api.update_service(req.params.service, req.body);
+        if (ret.good)
+            res.status(200).send("Done");
+        else
+            res.status(400).send(ret.error);
+    });
+
+    router.delete("/services/:service", (req, res) => {
+        let admin = get_admin_user(req, res, sa_app);
+        if (!admin)
+        {
+            not_logged_in(res);
+            return;
+        }
+
+        let name = req.params.service;
+        let ret = sa_app.api.remove_service(name);
+        if (ret.good)
+            res.status(200).send("Done");
+        else
+            res.status(400).send(ret.error);
     });
 
     router.post("/set_permissions", (req, res) => {

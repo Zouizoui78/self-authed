@@ -45,13 +45,10 @@ function set_user(username, new_user, overwrite = true)
 {
     let users = _app.get_users();
 
-    if (!overwrite && users[username])
+    if (!overwrite && users[username]
+        || username != new_user.username && users[new_user.username])
     {
-        return _app.tools.result(false, `User '${username}' already exists`, 3);
-    }
-    else if (username != new_user.username && users[new_user.username])
-    {
-        return _app.tools.result(false, `User '${new_user.username}' already exists`, 3);
+        return _app.tools.result(false, `Cannot set user '${username}' : '${new_user.username}' already exists`, 3);
     }
 
     if (new_user.password)
@@ -95,19 +92,41 @@ function remove_user(username)
     return _app.tools.result(false, "User does not exist");
 }
 
-function add_service(name, url)
+function set_service(name, new_service, overwrite = true)
 {
+    let config = _app.get_config();
+    let new_name = new_service.servicename;
+    let new_url = new_service.serviceurl;
+
     if (_check_is_string(name) == false)
         return _app.tools.result(false, "Service name is not a string", 1);
-    if (_check_is_string(url) == false)
-        return _app.tools.result(false, "Service url is not a string", 2);
-    var config = _app.get_config();
-    if (name == "all")
-        return _app.tools.result(false, "Cannot have a service named 'all'", 3);
-    config.services[name] = url;
-    config._url_to_services[url] = name;
+    if (_check_is_string(new_name) == false)
+        return _app.tools.result(false, "Service new name is not a string", 2);
+    if (_check_is_string(new_url) == false)
+        return _app.tools.result(false, "Service url is not a string", 3);
+    if (name == "all" || new_name == "all")
+        return _app.tools.result(false, "Cannot have a service named 'all'", 4);
+
+    if (!overwrite && config.services[name]
+        || name != new_name && config.services[new_name])
+    {
+        return _app.tools.result(false, `Cannot set service '${name}' : '${new_name}' already exists`, 5);
+    }
+
+    config.services[name] = new_url;
+    config._url_to_services[new_url] = name;
     _app.write_config();
     return _app.tools.result(true);
+}
+
+function add_service(new_service)
+{
+    return set_service(new_service.servicename, new_service, false);
+}
+
+function update_service(service_name, new_service)
+{
+    return set_service(service_name, new_service, true);
 }
 
 function _remove_service_from_users(name)
@@ -184,7 +203,9 @@ function check_permissions(username, service)
 
 module.exports = {
     init: init,
+    set_service: set_service,
     add_service: add_service,
+    update_service: update_service,
     remove_service: remove_service,
     set_user: set_user,
     add_user: add_user,
