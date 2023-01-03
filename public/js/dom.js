@@ -24,9 +24,8 @@ function array_to_pretty_dom_el(tag, strs, sort = true)
         strs.sort()
 
     let el = document.createElement(tag);
-    for (i in strs)
+    for (let str of strs)
     {
-        let str = strs[i];
         el.innerHTML += `<span class='badge bg-primary me-1'>${str}</span>`;
     }
 

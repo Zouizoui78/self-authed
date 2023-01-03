@@ -31,13 +31,18 @@ function array_equals(arr1, arr2)
     return true;
 }
 
+function has_all_permissions(user)
+{
+    return array_equals(user.permissions, ["all"]);
+}
+
 function list_service_users(users, service_name)
 {
     let ret = [];
     for (key in users)
     {
         let user = users[key];
-        if (array_equals(user.permissions, ["all"])
+        if (has_all_permissions(user)
             || user.permissions.includes(service_name))
         {
             ret.push(key);

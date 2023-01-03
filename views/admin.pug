@@ -46,11 +46,22 @@ block content
                 .modal-header
                     h5#user-modal-title
                 .modal-body
-                    input#user-modal-username.form-control.mb-3(type="text" placeholder="Username")
-                    input#user-modal-password.form-control.mb-3(type="password" placeholder="Password")
-                    .form-check.mb-3
-                        input#user-modal-is-admin.form-check-input(type="checkbox")
-                        label.form-check-label(for="is-admin") Admin
+                    .row.mb-3
+                        .col-lg-6.col-md-12
+                            h5 User information
+                            input#user-modal-username.form-control.mb-3(type="text" placeholder="Username")
+                            input#user-modal-password.form-control.mb-3(type="password" placeholder="Password")
+                            .form-check
+                                input#user-modal-is-admin.form-check-input(type="checkbox")
+                                label.form-check-label(for="user-modal-is-admin") Admin
+                        .col-lg-6.col-md-12
+                            .row
+                                .col
+                                    h5 Permissions
+                                .col.form-check.pull-right
+                                    input#user-modal-all-permission.form-check-input(type="checkbox")
+                                    label.form-check-label(for="user-modal-all-permission") all
+                            div#user-modal-permissions
                 .modal-footer
                     button#user-modal-cancel-btn.btn.btn-secondary(type="button" data-bs-dismiss="modal") Cancel
                     button#user-modal-save-btn.btn.btn-primary(type="button") Save

@@ -85,9 +85,8 @@ function load_user_table(users)
     remove_dom_node_children(table_body);
 
     let keys = Object.keys(users).sort();
-    for (i in keys)
+    for (let key of keys)
     {
-        let key = keys[i];
         let new_row = user_table_new_row(users[key]);
         table_body.appendChild(new_row);
     }
@@ -142,9 +141,8 @@ function load_service_table(services)
     remove_dom_node_children(table_body);
 
     let keys = Object.keys(services).sort();
-    for (i in keys)
+    for (let key of keys)
     {
-        let key = keys[i];
         let new_row = service_table_new_row(key, services[key]);
         table_body.appendChild(new_row);
     }
@@ -158,6 +156,8 @@ function user_modal_reset()
     _user_modal.dom.username.value = "";
     _user_modal.dom.password.value = "";
     _user_modal.dom.is_admin.checked = false;
+    _user_modal.dom.all_permission.checked = false;
+    remove_dom_node_children(_user_modal.dom.permissions);
 }
 
 function user_modal_set(user)
@@ -166,6 +166,14 @@ function user_modal_set(user)
     _user_modal.dom.title.textContent = user.username;
     _user_modal.dom.username.value = user.username;
     _user_modal.dom.is_admin.checked = user.admin;
+
+    let perms_list = user_modal_make_permissions_list(_services, user);
+    _user_modal.dom.permissions.appendChild(perms_list);
+
+    if (has_all_permissions(user))
+    {
+        _user_modal.dom.all_permission.click();
+    }
 }
 
 function user_modal_get()
@@ -174,7 +182,7 @@ function user_modal_get()
         username: _user_modal.dom.username.value,
         password: _user_modal.dom.password.value,
         admin: _user_modal.dom.is_admin.checked,
-        permissions: []
+        permissions: user_modal_get_permissions_list()
     };
     return user;
 }
@@ -269,6 +277,22 @@ document.addEventListener("DOMContentLoaded", function(event)
     _user_modal.dom.username = get_dom_node_by_id("user-modal-username");
     _user_modal.dom.password = get_dom_node_by_id("user-modal-password");
     _user_modal.dom.is_admin = get_dom_node_by_id("user-modal-is-admin");
+    _user_modal.dom.permissions = get_dom_node_by_id("user-modal-permissions");
+
+    _user_modal.dom.all_permission = get_dom_node_by_id("user-modal-all-permission");
+    _user_modal.dom.all_permission.addEventListener("change", () => {
+        let items = _user_modal.dom.permissions.children[0].children;
+        for (let item of items)
+        {
+            if (_user_modal.dom.all_permission.checked)
+                item.classList.add("disabled");
+            else
+                item.classList.remove("disabled");
+
+            let check = item.getElementsByTagName("input")[0];
+            check.checked = false;
+        }
+    });
 
     _user_modal.dom.save_btn = get_dom_node_by_id("user-modal-save-btn");
     _user_modal.dom.save_btn.addEventListener("click", user_modal_save);
@@ -278,6 +302,9 @@ document.addEventListener("DOMContentLoaded", function(event)
         console.log("New user");
         _user_modal.dom.title.textContent = "New user";
         _user_modal.new = true;
+
+        let perms_list = user_modal_make_permissions_list(_services);
+        _user_modal.dom.permissions.appendChild(perms_list);
     });
 
     _user_modal.bs = new bootstrap.Modal("#user-modal");
@@ -396,4 +423,59 @@ function service_table_new_row(name, url)
     });
 
     return tr;
+}
+
+function user_modal_make_permissions_list(services, user)
+{
+    let service_list = Object.keys(services).sort();
+
+    let ul = document.createElement("ul");
+    ul.classList = "list-group";
+
+    for (let service of service_list)
+    {
+        console.log(service);
+        let li = document.createElement("li");
+        li.classList = "list-group-item";
+
+        let form = document.createElement("div");
+        form.classList = "form-check";
+
+        let check = document.createElement("input");
+        check.id = `${service}-checkbox`;
+        check.classList = "form-check-input";
+        check.type = "checkbox";
+
+        if (user)
+            check.checked = user.permissions.includes(service);
+
+        let label = document.createElement("label");
+        label.classList = "form-check-label stretched-link";
+        label.setAttribute("for", check.id);
+        label.textContent = service;
+
+        form.appendChild(check);
+        form.appendChild(label);
+        li.appendChild(form);
+        ul.appendChild(li);
+    }
+    return ul;
+}
+
+function user_modal_get_permissions_list()
+{
+    if (_user_modal.dom.all_permission.checked)
+        return ["all"];
+
+    let ret = [];
+    let items = _user_modal.dom.permissions.children[0].children;
+    for (let item of items)
+    {
+        if (item.getElementsByTagName("input")[0].checked)
+        {
+            let service = item.getElementsByTagName("label")[0].textContent;
+            ret.push(service);
+        }
+    }
+    return ret;
 }
