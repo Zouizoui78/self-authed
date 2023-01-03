@@ -17,7 +17,7 @@ function read_json(path)
     }
     catch(err)
     {
-        console.error(err.message);
+        console.log(err.message);
         return null;
     }
 }
@@ -73,8 +73,25 @@ function read_users(path)
 {
     console.log("Loading user file: " + path);
     let json = read_json(path);
-    if (json == null)
-        return {};
+
+    // No user file
+    if (json == null) {
+        console.log("Creating default users.json");
+        // Password = "admin"
+        let default_user = {
+            admin: {
+            username: "admin",
+            password: "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918",
+            permissions: [
+                "all"
+            ],
+            admin: true
+            },
+        };
+        write_json(default_user, path);
+        return default_user;
+    }
+
     let ret = {};
     for (var key in json)
     {

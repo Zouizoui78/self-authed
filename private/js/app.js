@@ -30,7 +30,7 @@ function init(configuration_path)
     _configuration = _tools.read_configuration(configuration_path);
     if (_configuration != null)
     {
-        _users = _tools.read_users(_configuration.passwords);
+        _users = _tools.read_users(_configuration.users);
         if (_configuration.debug)
         {
             console.log("Found users:");
@@ -46,7 +46,7 @@ function init(configuration_path)
 
 function write_users()
 {
-    _tools.write_json(_users, _configuration.passwords);
+    _tools.write_json(_users, _configuration.users);
 }
 
 function write_config()

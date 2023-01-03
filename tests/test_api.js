@@ -3,11 +3,11 @@ const assert = require('assert').strict;
 process.chdir(__dirname)
 
 const tools = require("../private/js/tools.js");
-assert(tools.write_json({}, "./configurations/test_passwords.json"));
+assert(tools.write_json({}, "./configurations/test_users.json"));
 assert(tools.write_json({
     debug: true,
     port: 1337,
-    passwords: "./configurations/test_passwords.json",
+    users: "./configurations/test_users.json",
     cookie_domain: ".domain.ovh",
     service_method: "subdomain",
     services: {}
