@@ -113,7 +113,7 @@ function write_json(data, path)
 {
     try
     {
-        let json_data = JSON.stringify(data, null, 2);
+        let json_data = JSON.stringify(data, null, 4);
         fs.writeFileSync(path, json_data);
         return true;
     }

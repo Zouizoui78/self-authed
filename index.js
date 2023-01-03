@@ -17,25 +17,28 @@ if (sa_app.init('./conf.json') == false)
 // Middlewares
 app.use(express.json()); // JSON body parsing
 
-let session_middleware = session({
+let session_conf = {
     name: "session",
     secret: sa_app.auth.generate_token(100),
     saveUninitialized: false, // true -> deprecated
     resave: false, // true -> deprecated
     cookie: {
         maxAge: 31 * 24 * 3600 * 1000, // Cookie validity in milliseconds
-        httpOnly: true,
+        httpOnly: true
     }
-})
+};
 
-if (sa_app.get_config().dev != true)
+if (!sa_app.get_config().debug)
 {
-    session_middleware.cookie.domain = sa_app.get_config().cookie_domain;
-    session_middleware.cookie.secure = true; // https
+    // TODO : make secure cookies work
+    // session_conf.proxy = true;
+    // session_conf.cookie.secure = true; // https
+    session_conf.cookie = sa_app.get_config().cookie_domain
 }
 
-// With this middleware enabled everything stored in req.session is saved across requests
-app.use(session_middleware);
+// With this middleware enabled everything stored in req.session
+// is saved *server-side* across requests
+app.use(session(session_conf));
 
 // Rendering engine
 app.set("view engine", "pug");

@@ -1,11 +1,7 @@
 {
-    "dev": true,
-    "debug": true,
     "port": 24080,
     "users": "./users.json",
-    "cookie_domain": ".domain.ovh",
+    "cookie_domain": ".domain.com",
     "service_method": "subdomain",
-    "services": {
-        "service": "subdomain.domain.com"
-    }
+    "services": {}
 }
