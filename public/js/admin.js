@@ -71,7 +71,7 @@ function remove_user(username)
 function remove_user_success(res, req)
 {
     console.log("User removed: " + req.responseURL);
-    load_users();
+    load_users_and_services();
 }
 
 function remove_user_error(err)
@@ -90,10 +90,8 @@ function remove_service_error(err)
     console.error("Service not removed: " + err)
 }
 
-function remove_service()
+function remove_service(sevice_name)
 {
-    if (!_remove.service)
-        return ;
     ajax.post("/api/remove_service", {
         servicename: _remove.service.value,
     },
@@ -118,6 +116,7 @@ function load_users_success(res, req)
         _users = JSON.parse(res);
     }
     load_user_table(_users);
+    console.log("Loaded users table");
 }
 
 function load_users_err(err)
@@ -160,11 +159,18 @@ function load_services_success(res, req)
     }
 
     load_service_table(_services);
+    console.log("Loaded services table");
 }
 
 function load_services_err(err)
 {
     console.error(err);
+}
+
+function load_users_and_services()
+{
+    load_users();
+    load_services();
 }
 
 function load_service_table(services)
@@ -197,7 +203,7 @@ function user_modal_reset()
 function user_modal_set(user)
 {
     console.log(`Showing user ${user.username} in modal`);
-    _user_modal.dom.title.textContent = `${user.username}`;
+    _user_modal.dom.title.textContent = user.username;
     _user_modal.dom.username.value = user.username;
     _user_modal.dom.is_admin.checked = user.admin;
 }
@@ -217,9 +223,13 @@ function user_modal_save()
 {
     let user = user_modal_get();
     let method = _user_modal.new ? ajax.post : ajax.put;
+    if (_user_modal.new)
+        var username = user.username;
+    else
+        var username = _user_modal.dom.title.textContent
 
     method(
-        "/api/users/" + _user_modal.dom.title.textContent,
+        "/api/users/" + username,
         user,
         user_modal_save_success,
         user_modal_save_error
@@ -229,7 +239,7 @@ function user_modal_save()
 function user_modal_save_success()
 {
     _user_modal.bs.hide();
-    load_users();
+    load_users_and_services();
 }
 
 function user_modal_save_error(err)
@@ -249,7 +259,7 @@ function service_modal_reset()
 function service_modal_set(name, addr)
 {
     console.log(`Showing service ${name} in modal`);
-    _service_modal.dom.title.textContent = `${name}`;
+    _service_modal.dom.title.textContent = name;
     _service_modal.dom.name.value = name;
     _service_modal.dom.addr.value = addr;
 }
@@ -258,9 +268,13 @@ function service_modal_set(name, addr)
 function service_modal_save()
 {
     let method = _service_modal.new ? ajax.post : ajax.put;
+    if (_service_modal.new)
+        var service_name = _service_modal.dom.name.value;
+    else
+        var service_name = _service_modal.dom.title.textContent
 
     method(
-        "/api/services/" + _service_modal.dom.title.textContent,
+        "/api/services/" + service_name,
         [
             _service_modal.dom.name.value,
             _service_modal.dom.addr.value
@@ -283,8 +297,7 @@ function service_modal_save_error(err)
 
 document.addEventListener("DOMContentLoaded", function(event)
 {
-    load_users();
-    load_services();
+    load_users_and_services();
 
     // User modal
     // We use a tmp variale here to avoid overwriting
