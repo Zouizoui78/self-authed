@@ -33,7 +33,7 @@ if (!sa_app.get_config().debug)
     // TODO : make secure cookies work
     // session_conf.proxy = true;
     // session_conf.cookie.secure = true; // https
-    session_conf.cookie = sa_app.get_config().cookie_domain
+    session_conf.cookie.domain = sa_app.get_config().cookie_domain
 }
 
 // With this middleware enabled everything stored in req.session
