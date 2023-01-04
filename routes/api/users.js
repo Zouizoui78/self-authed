@@ -81,5 +81,21 @@ module.exports = function(sa_app)
         }
     });
 
+    router.put("/:username/password", (req, res) => {
+        let user = sa_app.session.get_user_session(req);
+        if (!user)
+        {
+            not_logged_in(res);
+        }
+
+        let username = req.params.username;
+        let password = req.body.password;
+        let ret = sa_app.api.change_password(username, password);
+        if (ret.good)
+            res.status(200).send("Done");
+        else
+            res.status(400).send(ret);
+    });
+
     return router;
 }

@@ -28,7 +28,7 @@ module.exports = function(sa_app)
         if (service)
             res.status(200).send(service);
         else
-            res.status(400).send("Unknwon service");
+            res.status(400).send("Unknown service");
     })
 
     router.post("/:service", (req, res) => {

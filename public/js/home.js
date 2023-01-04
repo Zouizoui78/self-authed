@@ -88,16 +88,21 @@ function password_change()
         return ;
     if (password_check_same())
     {
-        ajax.post("/api/change_password", {
-            password: _dom.password.value,
-        }, password_validate,
-        password_error);
+        ajax.put(
+            `/api/users/${_dom.username.textContent}/password`,
+            {
+                password: _dom.password.value,
+            },
+            password_validate,
+            password_error
+        );
     }
 }
 
 document.addEventListener("DOMContentLoaded", function(event)
 {
     console.log("Home loaded");
+    _dom.username = get_dom_node_by_id("username");
     _dom.permissions = get_dom_node_by_id("permissions");
     _dom.password = get_dom_node_by_id("password");
     _dom.validation_password = get_dom_node_by_id("validation-password");
