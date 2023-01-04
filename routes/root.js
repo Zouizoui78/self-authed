@@ -61,7 +61,7 @@ module.exports = function(sa_app)
         if (sa_app.session.validate_session(req))
             res.sendStatus(200);
         else
-            res.sendStatus(401);
+            res.sendStatus(403);
     });
 
     router.get("/", (req, res) => {

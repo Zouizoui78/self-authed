@@ -1,5 +1,12 @@
 const fs = require('fs');
 
+let _app;
+
+function init(app)
+{
+    _app = app;
+}
+
 function result(good, error_message, code)
 {
     return {good: good, error: error_message, code: code};
@@ -161,35 +168,14 @@ function get_subdomain_from_domain(url)
 
 /* Used by routes */
 
-function not_logged_in(res)
+function send_unauthorized(res)
 {
-    let ret = sa_app.tools.result(false, "Not logged in", 11);
-    res.status(401).send(ret);
-}
-
-function not_admin(res)
-{
-    let ret = sa_app.tools.result(false, "You are not admin", 10);
-    res.status(401).send(ret);
-}
-
-function get_admin_user(req, res, sa_app)
-{
-    let user = sa_app.session.get_user_session(req);
-    if (user)
-    {
-        if (sa_app.session.is_admin(user))
-        {
-            return user;
-        }
-        else
-            not_admin(res);
-    }
-    else
-        not_logged_in(res);
+    let ret = _app.tools.result(false, "Unauthorized", 11);
+    res.status(403).send(ret);
 }
 
 module.exports = {
+    "init": init,
     "result": result,
     "update_object": update_object,
     "update_list": update_list,
@@ -199,7 +185,5 @@ module.exports = {
     "read_configuration": read_configuration,
     "get_subdomain_from_domain": get_subdomain_from_domain,
     "get_domain_from_url": get_domain_from_url,
-    "not_logged_in": not_logged_in,
-    "not_admin": not_admin,
-    "get_admin_user": get_admin_user
+    "send_unauthorized": send_unauthorized
 }

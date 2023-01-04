@@ -14,12 +14,15 @@ function load_user_permissions()
 {
     if (!_dom.permissions)
         return ;
-    ajax.get("/api/permissions", null,
+    ajax.get(
+        `/api/users/${_dom.username.textContent}/permissions`,
+        null,
         update_user_permissions,
         function(err)
         {
             console.error(err);
-        });
+        }
+    );
 }
 
 function password_check_same()

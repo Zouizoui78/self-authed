@@ -39,6 +39,7 @@ function init(configuration_path)
         _api.init(this);
         _auth.init(this);
         _session.init(this);
+        _tools.init(this);
         return true;
     }
     return false;

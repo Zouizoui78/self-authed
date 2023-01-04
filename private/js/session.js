@@ -70,9 +70,7 @@ function validate_session(req)
 
 function is_admin(user)
 {
-    if (!user)
-        return false;
-    return user.admin == true;
+    return user && user.admin == true;
 }
 
 module.exports = {
