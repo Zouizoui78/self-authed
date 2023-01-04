@@ -3,9 +3,7 @@ let router = express();
 
 module.exports = function(sa_app)
 {
-    let api = require('./rest_api')(sa_app);
-
-    router.use("/api", api);
+    router.use("/api", require('./api/api')(sa_app));
 
     router.post("/login", (req, res) => {
         let username = req.body.username;
