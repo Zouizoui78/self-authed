@@ -61,6 +61,7 @@ module.exports = function(sa_app)
         if (username == _user.username && _user.admin)
         {
             res.status(400).send("As an admin you cannot remove yourself");
+            return;
         }
 
         let ret = sa_app.api.remove_user(username);
