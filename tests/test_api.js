@@ -18,24 +18,43 @@ assert(sa_app.init('./configurations/test_conf.json'));
 
 var ret;
 
+function look_for_error(result, expected_error_code)
+{
+    assert(result, result.error);
+    assert(result.good === false, result.error);
+    assert(result.code === expected_error_code, result.error);
+}
+
 //
 // Add user
 //
 
 // Password too short
-ret = sa_app.api.add_user("test", "12");
-assert(ret && ret.good == false, ret.error);
+ret = sa_app.api.add_user({
+    username: "test",
+    password: "12"
+});
+look_for_error(ret, 2);
 
 // Password not string
-ret = sa_app.api.add_user("test", 12);
-assert(ret && ret.good == false, ret.error);
+ret = sa_app.api.add_user({
+    username: "test",
+    password: 12
+});
+look_for_error(ret, 1);
 
-ret = sa_app.api.add_user("test", "password");
+ret = sa_app.api.add_user({
+    username: "test",
+    password: "password"
+});
 assert(ret && ret.good, ret.error);
 
 // User already added
-ret = sa_app.api.add_user("test", "password2");
-assert(ret && ret.good == false, ret.error);
+ret = sa_app.api.add_user({
+    username: "test",
+    password: "password"
+});
+look_for_error(ret, 1);
 
 //
 // User password
@@ -46,14 +65,14 @@ assert(ret && ret.good, ret.error);
 
 // Credentials wrong
 ret = sa_app.auth.validate_credentials("test", "password2");
-assert(ret && ret.good == false, ret.error);
+look_for_error(ret, 2);
 
 ret = sa_app.api.change_password("test", "password3");
 assert(ret && ret.good, ret.error);
 
 // Credentials wrong after password change
 ret = sa_app.auth.validate_credentials("test", "password");
-assert(ret && ret.good == false, ret.error);
+look_for_error(ret, 2);
 
 ret = sa_app.auth.validate_credentials("test", "password3");
 assert(ret && ret.good, ret.error);
@@ -63,33 +82,60 @@ assert(ret && ret.good, ret.error);
 //
 
 ret = sa_app.api.remove_user("test");
-assert(ret && ret.good, ret.error);
+assert(ret && ret.good === true, ret.error);
 
 ret = sa_app.auth.validate_credentials("test", "password");
-assert(ret && ret.good == false, ret.error);
+look_for_error(ret, 1);
 
 ret = sa_app.api.change_password("test", "password3");
-assert(ret && ret.good == false, ret.error);
+look_for_error(ret, 1);
 
 //
-// Service adding 
+// Service adding
 //
 
-ret = sa_app.api.add_user("test", "password");
-assert(ret && ret.good, ret.error);
-ret = sa_app.api.add_user("test2", "password");
-assert(ret && ret.good, ret.error);
-ret = sa_app.api.add_user("test3", "password");
-assert(ret && ret.good, ret.error);
-
-ret = sa_app.api.add_service("service", "service.domain.com");
-assert(ret && ret.good, ret.error);
-ret = sa_app.api.add_service("service2", "other.domain.com");
-assert(ret && ret.good, ret.error);
-ret = sa_app.api.add_service("service3", "another.domain.com");
+ret = sa_app.api.add_user({
+    username: "test",
+    password: "password"
+});
 assert(ret && ret.good, ret.error);
 
-ret = sa_app.api.add_service("service", "renamed.domain.com");
+ret = sa_app.api.add_user({
+    username: "test2",
+    password: "password2"
+});
+
+ret = sa_app.api.add_user({
+    username: "test3",
+    password: "password3"
+});
+assert(ret && ret.good, ret.error);
+
+ret = sa_app.api.add_service({
+    servicename: "service",
+    serviceurl: "domain.com"
+});
+assert(ret && ret.good, ret.error);
+
+ret = sa_app.api.add_service({
+    servicename: "service2",
+    serviceurl: "domain2.com"
+});
+assert(ret && ret.good, ret.error);
+
+ret = sa_app.api.add_service({
+    servicename: "service3",
+    serviceurl: "domain3.com"
+});
+assert(ret && ret.good, ret.error);
+
+ret = sa_app.api.update_service(
+    "service",
+    {
+        servicename: "service",
+        serviceurl: "renamed.domain.com"
+    }
+);
 assert(ret && ret.good, ret.error);
 
 //
@@ -103,7 +149,8 @@ ret = sa_app.api.check_permissions("test", "service");
 assert(ret && ret.good, ret.error);
 
 ret = sa_app.api.check_permissions("test2", "service");
-assert(ret && ret.good == false, ret.error);
+look_for_error(ret, 1);
+
 sa_app.get_user('test2').permissions = ["all"];
 ret = sa_app.api.check_permissions("test2", "service");
 assert(ret && ret.good, ret.error);
@@ -118,6 +165,8 @@ assert(ret && ret.good, ret.error);
 
 ret = sa_app.api.remove_service("service3");
 assert(ret && ret.good, ret.error);
+
 ret = sa_app.api.check_permissions("test3", "service3");
-assert(ret && ret.good == false, ret.error);
+look_for_error(ret, 1);
+
 assert(sa_app.get_user('test3').permissions.length == 0);

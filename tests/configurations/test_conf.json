@@ -1,12 +1,8 @@
 {
-  "debug": true,
-  "port": 1337,
-  "users": "./configurations/test_users.json",
-  "cookie_domain": ".domain.ovh",
-  "service_method": "subdomain",
-  "services": {
-    "service": "renamed.domain.com",
-    "service2": "other.domain.com"
-  },
-  "password_min_length": 5
+    "debug": true,
+    "port": 1337,
+    "users": "./configurations/test_users.json",
+    "cookie_domain": ".domain.ovh",
+    "service_method": "subdomain",
+    "services": {}
 }

@@ -38,7 +38,7 @@ function change_password(username, password)
         }
         return ret;
     }
-    return _app.tools.result(false, "No such user", 3);
+    return _app.tools.result(false, "No such user", 1);
 }
 
 function set_user(username, new_user, overwrite = true)
@@ -48,7 +48,7 @@ function set_user(username, new_user, overwrite = true)
     if (!overwrite && users[username]
         || username != new_user.username && users[new_user.username])
     {
-        return _app.tools.result(false, `Cannot set user '${username}' : '${new_user.username}' already exists`, 3);
+        return _app.tools.result(false, `Cannot set user '${username}' : '${new_user.username}' already exists`, 1);
     }
 
     if (new_user.password)
@@ -60,7 +60,14 @@ function set_user(username, new_user, overwrite = true)
     }
     else
     {
-        new_user.password = users[username].password;
+        if (users[username])
+        {
+            new_user.password = users[username].password;
+        }
+        else
+        {
+            return _app.tools.result(false, "Cannot create a passwordless user", 2);
+        }
     }
 
     delete users[username];
