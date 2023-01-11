@@ -6,6 +6,7 @@ const app = express();
 const server = require('http').createServer(app);
 
 const session = require('express-session');
+const FileStore = require('session-file-store')(session);
 
 const sa_app = require("./private/js/app.js");
 const { read_configuration } = require('./private/js/tools.js');
@@ -28,7 +29,11 @@ let session_conf = {
     cookie: {
         maxAge: config.cookies.max_days * 24 * 3600 * 1000, // Cookie validity in milliseconds
         httpOnly: true
-    }
+    },
+    store: new FileStore({
+        path: "./sessions",
+        secret: sa_app.auth.generate_token(20),
+    })
 };
 
 if (!config.debug)
