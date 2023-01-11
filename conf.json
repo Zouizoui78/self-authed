@@ -7,7 +7,6 @@
     },
     "service_from_subdomain": true,
     "services": {
-        "test2": "test2.localhost.fr"
-    },
-    "debug": true
+        "service": "subdomain.domain.fr"
+    }
 }
