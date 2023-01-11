@@ -44,9 +44,22 @@ document.addEventListener("DOMContentLoaded", function(event)
     console.log("Loaded login");
     var log_btn = get_dom_node_by_id("log-btn");
     if (log_btn)
+    {
         log_btn.addEventListener("click", do_login);
+        document.addEventListener("keypress", function(event)
+        {
+            if (event.key === "Enter")
+            {
+                event.preventDefault();
+                log_btn.click();
+            }
+        });
+    }
     _username = get_dom_node_by_id("username");
     _validation_username = get_dom_node_by_id("validation-username");
+
+    _username.focus();
+
     _password = get_dom_node_by_id("password");
     _validation_password = get_dom_node_by_id("validation-password");
 });

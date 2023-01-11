@@ -1,4 +1,5 @@
 {
+    "debug": true,
     "port": 24080,
     "users": "./users.json",
     "cookies": {

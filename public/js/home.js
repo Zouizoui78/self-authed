@@ -105,6 +105,7 @@ function password_change()
 document.addEventListener("DOMContentLoaded", function(event)
 {
     console.log("Home loaded");
+
     _dom.username = get_dom_node_by_id("username");
     _dom.permissions = get_dom_node_by_id("permissions");
     _dom.password = get_dom_node_by_id("password");

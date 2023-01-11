@@ -31,3 +31,15 @@ function array_to_pretty_dom_el(tag, strs, sort = true)
 
     return el;
 }
+
+function add_loading()
+{
+    get_dom_node_by_id("loader").style.display = "block";
+    get_dom_node_by_id("grey_screen").style.display = "block";
+}
+
+function end_loading()
+{
+    get_dom_node_by_id("loader").style.display = "none";
+    get_dom_node_by_id("grey_screen").style.display = "none";
+}
