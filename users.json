@@ -1,10 +1,16 @@
 {
     "admin": {
-        "username": "admin",
-        "password": "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918",
-        "permissions": [
-            "all"
-        ],
+        "name": "admin",
+        "password": "0e07cf830957701d43c183f1515f63e6b68027e528f43ef52b1527a520ddec82",
+        "permissions": [],
         "admin": true
+    },
+    "user123": {
+        "name": "user123",
+        "password": "31f7a65e315586ac198bd798b6629ce4903d0899476d5741a9f32e2e521b6a66",
+        "permissions": [
+            "test2"
+        ],
+        "admin": false
     }
 }

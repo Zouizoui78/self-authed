@@ -2,7 +2,10 @@
     "debug": true,
     "port": 1337,
     "users": "./configurations/test_users.json",
-    "cookie_domain": ".domain.ovh",
-    "service_method": "subdomain",
+    "cookies": {
+        "domain": ".domain.ovh",
+        "max_days": 1
+    },
+    "service_from_subdomain": true,
     "services": {}
 }

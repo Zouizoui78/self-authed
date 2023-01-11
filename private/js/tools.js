@@ -41,22 +41,21 @@ function read_configuration(path)
     if (configuration.port == undefined)
         configuration.port = 24080;
 
-    if (configuration.service_method == undefined)
-        configuration.service_method = "subdomain"
-
-    if (configuration.password_min_length == undefined)
-        configuration.password_min_length = 5;
-
-    if(configuration.cookie_domain == undefined)
+    if(configuration.cookies.domain == undefined)
     {
-        console.error("Required setting 'cookie_domain' not found in configuration.");
+        console.error("Required setting 'cookies.domain' not found in configuration.");
+        return null;
+    }
+    if(configuration.cookies.max_days == undefined)
+    {
+        console.error("Required setting 'cookies.max_days' not found in configuration.");
         return null;
     }
 
-    console.log("Service retrieval from: " + configuration.service_method);
-    if (configuration.service_method == "list" && !configuration.services)
+    console.log("Service retrieval from: " + (configuration.service_from_subdomain ? "domain" : "list"));
+    if (!configuration.service_from_subdomain && !configuration.services)
     {
-        console.error("No service list configured !");
+        console.error("No service list configured");
         return null;
     }
 
@@ -90,8 +89,27 @@ function read_users(path)
         if (json.hasOwnProperty(key))
         {
             let user = json[key];
-            ret[user.username] = {
-                username: user.username,
+
+            if (!user.password)
+            {
+                console.error(`User ${key} has no password`);
+                return null;
+            }
+
+            if (user.permissions == undefined)
+            {
+                console.error(`User ${key} has no permissions`);
+                return null;
+            }
+
+            if (user.admin  == undefined)
+            {
+                console.error(`User ${key} has no admin rights set`);
+                return null;
+            }
+
+            ret[user.name] = {
+                name: user.name,
                 password: user.password,
                 permissions: user.permissions,
                 admin: user.admin

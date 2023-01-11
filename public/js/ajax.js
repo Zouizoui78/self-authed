@@ -6,6 +6,7 @@ ajax.x = function()
     {
         return new XMLHttpRequest();
     }
+
     var versions = [
         "MSXML2.XmlHttp.6.0",
         "MSXML2.XmlHttp.5.0",
@@ -32,24 +33,14 @@ ajax.send = function(url, method, data, onSuccess, onError, onEnd, async)
     if (async === undefined)
         async = true;
 
-    if (url[0] == '/')
-        url = window.location.origin + url;
-
     var x = ajax.x();
     x.open(method, url, async);
     x.onreadystatechange = function()
     {
-        // XMLHttpRequest.DONE == 4
         if (x.readyState == XMLHttpRequest.DONE)
         {
             if (x.status >= 200 && x.status < 300)
             {
-                /*
-                console.log(x.responseText);
-                console.log(x.statusText);
-                console.log(x.getAllResponseHeaders());
-                console.log(x.responseURL);
-                */
                 if (onSuccess)
                     onSuccess(x.responseText, x);
             }

@@ -5,7 +5,7 @@ let _user = null;
 
 function is_allowed(user, target_username)
 {
-    return user && (user.username == target_username || user.admin);
+    return user && (user.name == target_username || user.admin);
 }
 
 module.exports = function(sa_app)
@@ -58,7 +58,7 @@ module.exports = function(sa_app)
 
     router.delete("/:username", (req, res) => {
         let username = req.params.username;
-        if (username == _user.username && _user.admin)
+        if (username == _user.name && _user.admin)
         {
             res.status(400).send("As an admin you cannot remove yourself");
             return;
@@ -88,7 +88,7 @@ module.exports = function(sa_app)
     });
 
     router.put("/:username/permissions", (req, res) => {
-        let username = req.body.username;
+        let username = req.body.name;
         let permissions = req.body.permissions;
         let ret = sa_app.api.set_permissions(username, permissions);
         if (ret.good)

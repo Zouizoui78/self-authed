@@ -10,6 +10,7 @@ function init(app)
 
 function _get_service_from_request(req)
 {
+    let config = _app.get_config();
     let origin = req.headers.origin;
     if (origin == undefined)
         origin = req.headers.referer;
@@ -19,14 +20,14 @@ function _get_service_from_request(req)
         console.error("Origin unknown: '" + origin + "' try adding Origin in http headers");
         return null;
     }
-    if (_app.get_config().debug)
+    if (config.debug)
         console.log("Origin URL: " + url);
-    if (_app.get_config().service_method == "subdomain")
+    if (config.service_from_subdomain)
         return _app.tools.get_subdomain_from_domain(url);
-    else if (_app.get_config().service_method == "list")
+    else
     {
-        if (_app.get_config().services)
-            return _app.get_config()._url_to_services[url];
+        if (config.services)
+            return config._url_to_services[url];
         console.error("No service list configured !");
     }
 }
@@ -38,22 +39,23 @@ function get_user_session(req)
 
 function validate_session(req)
 {
-    var user = get_user_session(req);
+    let config = _app.get_config();
+    let user = get_user_session(req);
 
     if (user != undefined)
     {
-        var username = user.username;
-        if (_app.get_config().debug)
+        let username = user.name;
+        if (config.debug)
             console.log("Found session for: " + username);
-        var service = _get_service_from_request(req);
+        let service = _get_service_from_request(req);
         if (service != undefined && service != null)
         {
-            if (_app.get_config().debug)
+            if (config.debug)
                 console.log("User '" + username + "' wants to use service: " + service);
-            var ret = _app.api.check_permissions(username, service);
+            let ret = _app.api.check_permissions(username, service);
             if (ret.good)
             {
-                if (_app.get_config().debug)
+                if (config.debug)
                     console.log("Permission accorded for: " + username);
                 return true;
             }
@@ -63,7 +65,7 @@ function validate_session(req)
         else
             console.error("Could not find service in request");
     }
-    if (_app.get_config().debug)
+    if (config.debug)
         console.log("No valid session found");
     return false;
 }

@@ -151,6 +151,7 @@ function load_service_table(services)
 function user_modal_reset()
 {
     console.log("User modal reset");
+
     _user_modal.dom.title.textContent = "TITLE PLACEHOLDER";
     _user_modal.new = false;
     _user_modal.dom.username.value = "";
@@ -162,9 +163,10 @@ function user_modal_reset()
 
 function user_modal_set(user)
 {
-    console.log(`Showing user ${user.username} in modal`);
-    _user_modal.dom.title.textContent = user.username;
-    _user_modal.dom.username.value = user.username;
+    console.log(`Showing user ${user.name} in modal`);
+
+    _user_modal.dom.title.textContent = user.name;
+    _user_modal.dom.username.value = user.name;
     _user_modal.dom.is_admin.checked = user.admin;
 
     let perms_list = user_modal_make_permissions_list(_services, user);
@@ -179,7 +181,7 @@ function user_modal_set(user)
 function user_modal_get()
 {
     let user = {
-        username: _user_modal.dom.username.value,
+        name: _user_modal.dom.username.value,
         password: _user_modal.dom.password.value,
         admin: _user_modal.dom.is_admin.checked,
         permissions: user_modal_get_permissions_list()
@@ -189,14 +191,17 @@ function user_modal_get()
 
 function user_modal_save()
 {
-    let user = user_modal_get();
-    let method = _user_modal.new ? ajax.post : ajax.put;
-    if (_user_modal.new)
-        var username = user.username;
-    else
-        var username = _user_modal.dom.title.textContent
+    let is_new_user = _user_modal.new;
+    let ajax_method = is_new_user ? ajax.post : ajax.put;
 
-    method(
+    let user = user_modal_get();
+
+    if (is_new_user)
+        var username = user.name;
+    else
+        var username = _user_modal.dom.title.textContent;
+
+    ajax_method(
         "/api/users/" + username,
         user,
         user_modal_save_success,
@@ -218,6 +223,7 @@ function user_modal_save_error(err)
 function service_modal_reset()
 {
     console.log("Service modal reset");
+
     _service_modal.dom.title.textContent = "TITLE PLACEHOLDER";
     _service_modal.new = false;
     _service_modal.dom.name.value = "";
@@ -227,26 +233,35 @@ function service_modal_reset()
 function service_modal_set(name, url)
 {
     console.log(`Showing service ${name} in modal`);
+
     _service_modal.dom.title.textContent = name;
     _service_modal.dom.name.value = name;
     _service_modal.dom.url.value = url;
 }
 
+function service_modal_get()
+{
+    return {
+        name: _service_modal.dom.name.value,
+        url: _service_modal.dom.url.value
+    };
+}
 
 function service_modal_save()
 {
-    let method = _service_modal.new ? ajax.post : ajax.put;
-    if (_service_modal.new)
-        var service_name = _service_modal.dom.name.value;
-    else
-        var service_name = _service_modal.dom.title.textContent
+    let is_new_service = _service_modal.new;
+    let ajax_method = is_new_service ? ajax.post : ajax.put;
 
-    method(
+    let service = service_modal_get();
+
+    if (is_new_service)
+        var service_name = service.servicename;
+    else
+        var service_name = _service_modal.dom.title.textContent;
+
+    ajax_method(
         "/api/services/" + service_name,
-        {
-            servicename: _service_modal.dom.name.value,
-            serviceurl: _service_modal.dom.url.value
-        },
+        service,
         service_modal_save_success,
         service_modal_save_error
     );
@@ -335,7 +350,7 @@ function user_table_new_row(user)
     let new_row = document.createElement("tr");
 
     let username = document.createElement("td");
-    username.textContent = user.username;
+    username.textContent = user.name;
     new_row.appendChild(username);
 
     let admin = document.createElement("td");
@@ -373,7 +388,7 @@ function user_table_new_row(user)
     });
 
     remove_btn.addEventListener("click", () => {
-        remove_user(user.username);
+        remove_user(user.name);
     });
 
     return new_row;

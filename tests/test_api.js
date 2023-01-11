@@ -8,8 +8,11 @@ assert(tools.write_json({
     debug: true,
     port: 1337,
     users: "./configurations/test_users.json",
-    cookie_domain: ".domain.ovh",
-    service_method: "subdomain",
+    cookies: {
+        domain: ".domain.ovh",
+        max_days: 1
+    },
+    service_from_subdomain: true,
     services: {}
 }, "./configurations/test_conf.json"));
 
@@ -31,27 +34,27 @@ function look_for_error(result, expected_error_code)
 
 // Password too short
 ret = sa_app.api.add_user({
-    username: "test",
+    name: "test",
     password: "12"
 });
 look_for_error(ret, 2);
 
 // Password not string
 ret = sa_app.api.add_user({
-    username: "test",
+    name: "test",
     password: 12
 });
 look_for_error(ret, 1);
 
 ret = sa_app.api.add_user({
-    username: "test",
+    name: "test",
     password: "password"
 });
 assert(ret && ret.good, ret.error);
 
 // User already added
 ret = sa_app.api.add_user({
-    username: "test",
+    name: "test",
     password: "password"
 });
 look_for_error(ret, 1);
@@ -95,45 +98,45 @@ look_for_error(ret, 1);
 //
 
 ret = sa_app.api.add_user({
-    username: "test",
+    name: "test",
     password: "password"
 });
 assert(ret && ret.good, ret.error);
 
 ret = sa_app.api.add_user({
-    username: "test2",
+    name: "test2",
     password: "password2"
 });
 
 ret = sa_app.api.add_user({
-    username: "test3",
+    name: "test3",
     password: "password3"
 });
 assert(ret && ret.good, ret.error);
 
 ret = sa_app.api.add_service({
-    servicename: "service",
-    serviceurl: "domain.com"
+    name: "service",
+    url: "domain.com"
 });
 assert(ret && ret.good, ret.error);
 
 ret = sa_app.api.add_service({
-    servicename: "service2",
-    serviceurl: "domain2.com"
+    name: "service2",
+    url: "domain2.com"
 });
 assert(ret && ret.good, ret.error);
 
 ret = sa_app.api.add_service({
-    servicename: "service3",
-    serviceurl: "domain3.com"
+    name: "service3",
+    url: "domain3.com"
 });
 assert(ret && ret.good, ret.error);
 
 ret = sa_app.api.update_service(
     "service",
     {
-        servicename: "service",
-        serviceurl: "renamed.domain.com"
+        name: "service",
+        url: "renamed.domain.com"
     }
 );
 assert(ret && ret.good, ret.error);

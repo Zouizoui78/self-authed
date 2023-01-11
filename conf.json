@@ -1,7 +1,13 @@
 {
     "port": 24080,
     "users": "./users.json",
-    "cookie_domain": ".domain.com",
-    "service_method": "subdomain",
-    "services": {}
+    "cookies": {
+        "domain": ".domain.com",
+        "max_days": 31
+    },
+    "service_from_subdomain": true,
+    "services": {
+        "test2": "test2.localhost.fr"
+    },
+    "debug": true
 }

@@ -16,7 +16,7 @@ function do_login()
 {
     clear_login_validation();
     ajax.post("/login", {
-        username: _username.value,
+        name: _username.value,
         password: _password.value
     }, function(e)
     {
