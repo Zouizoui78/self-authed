@@ -36,6 +36,7 @@ if (!config.debug)
     // TODO : make secure cookies work
     // session_conf.proxy = true;
     // session_conf.cookie.secure = true; // https
+
     session_conf.cookie.domain = config.cookies.domain
 }
 

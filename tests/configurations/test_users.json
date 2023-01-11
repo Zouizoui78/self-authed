@@ -1,1 +1,22 @@
-{}
+{
+    "test": {
+        "name": "test",
+        "password": "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8",
+        "permissions": [
+            "service",
+            "service2"
+        ]
+    },
+    "test2": {
+        "name": "test2",
+        "password": "6cf615d5bcaac778352a8f1f3360d23f02f34ec182e259897fd6ce485d7870d4",
+        "permissions": [
+            "all"
+        ]
+    },
+    "test3": {
+        "name": "test3",
+        "password": "5906ac361a137e2d286465cd6588ebb5ac3f5ae955001100bc41577c3d751764",
+        "permissions": []
+    }
+}

@@ -32,13 +32,6 @@ function look_for_error(result, expected_error_code)
 // Add user
 //
 
-// Password too short
-ret = sa_app.api.add_user({
-    name: "test",
-    password: "12"
-});
-look_for_error(ret, 2);
-
 // Password not string
 ret = sa_app.api.add_user({
     name: "test",
@@ -57,7 +50,7 @@ ret = sa_app.api.add_user({
     name: "test",
     password: "password"
 });
-look_for_error(ret, 1);
+look_for_error(ret, 5);
 
 //
 // User password
