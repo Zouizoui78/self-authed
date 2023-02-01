@@ -32,23 +32,27 @@ function look_for_error(result, expected_error_code)
 // Add user
 //
 
+let not_good_password = "bad passwrod";
+let good_password = "RealPassword123";
+let good_password_2 = "RealPassword123_2";
+
 // Password not string
 ret = sa_app.api.add_user({
     name: "test",
-    password: 12
+    password: not_good_password
 });
 look_for_error(ret, 1);
 
 ret = sa_app.api.add_user({
     name: "test",
-    password: "password"
+    password: good_password
 });
 assert(ret && ret.good, ret.error);
 
 // User already added
 ret = sa_app.api.add_user({
     name: "test",
-    password: "password"
+    password: good_password
 });
 look_for_error(ret, 5);
 
@@ -56,21 +60,21 @@ look_for_error(ret, 5);
 // User password
 //
 
-ret = sa_app.auth.validate_credentials("test", "password");
+ret = sa_app.auth.validate_credentials("test", good_password);
 assert(ret && ret.good, ret.error);
 
 // Credentials wrong
 ret = sa_app.auth.validate_credentials("test", "password2");
 look_for_error(ret, 2);
 
-ret = sa_app.api.change_password("test", "password3");
+ret = sa_app.api.change_password("test", good_password_2);
 assert(ret && ret.good, ret.error);
 
 // Credentials wrong after password change
 ret = sa_app.auth.validate_credentials("test", "password");
 look_for_error(ret, 2);
 
-ret = sa_app.auth.validate_credentials("test", "password3");
+ret = sa_app.auth.validate_credentials("test", good_password_2);
 assert(ret && ret.good, ret.error);
 
 //
@@ -83,7 +87,7 @@ assert(ret && ret.good === true, ret.error);
 ret = sa_app.auth.validate_credentials("test", "password");
 look_for_error(ret, 1);
 
-ret = sa_app.api.change_password("test", "password3");
+ret = sa_app.api.change_password("test", good_password_2);
 look_for_error(ret, 1);
 
 //
@@ -92,18 +96,18 @@ look_for_error(ret, 1);
 
 ret = sa_app.api.add_user({
     name: "test",
-    password: "password"
+    password: good_password
 });
 assert(ret && ret.good, ret.error);
 
 ret = sa_app.api.add_user({
     name: "test2",
-    password: "password2"
+    password: good_password
 });
 
 ret = sa_app.api.add_user({
     name: "test3",
-    password: "password3"
+    password: good_password
 });
 assert(ret && ret.good, ret.error);
 

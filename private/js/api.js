@@ -17,11 +17,12 @@ function _check_is_array(data)
 
 function _verif_password(password)
 {
-    if (typeof(password) != "string")
-        return _app.tools.result(false, "Password is not a string", 1);
-    if (password.length == 0)
-        return _app.tools.result(false, "Password must not be empty", 2);
-    return _app.tools.result(true);
+    var ret = _app.auth.validate_password(password);
+    var good = ret.valid;
+    var ret_code = ret.valid ? 0 : 1;
+    var error_str = ret.errors.join("\n");
+
+    return _app.tools.result(good, error_str, ret_code);
 }
 
 function change_password(username, password)

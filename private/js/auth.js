@@ -1,11 +1,43 @@
+const _password_validator = require('password-validator');
+const _crypto = require("crypto");
+
 let _app;
+let _password_schema;
+
+function _set_default_password_schema(password_schema)
+{
+    password_schema
+        .is().min(8)                                    // Minimum length 8
+        .is().max(100)                                  // Maximum length 100
+        .has().uppercase()                              // Must have uppercase letters
+        .has().lowercase()                              // Must have lowercase letters
+        .has().digits(2)                                // Must have at least 2 digits
+        .has().not().spaces()                           // Should not have spaces
+        .is().not().oneOf(['Passw0rd', 'Password123']); // Blacklist these values
+}
 
 function init(app)
 {
     _app = app;
+    _password_schema = new _password_validator();
+    _set_default_password_schema(_password_schema);
 }
 
-const _crypto = require("crypto");
+function validate_password(password)
+{
+    let errors = _password_schema.validate(password, { details: true });
+
+    var error_lst = []
+    for (var error of errors)
+    {
+        error_lst.push(error.message.replace("string", "password"));
+    }
+
+    return {
+        valid: errors.length == 0,
+        errors: error_lst,
+    };
+}
 
 function generate_token(length)
 {
@@ -20,9 +52,9 @@ function hash(toHash)
         .digest("hex");
 }
 
-function validate_credentials(username, passwordCandidate)
+function validate_credentials(username, password_candidate)
 {
-    let hashed = hash(passwordCandidate);
+    let hashed = hash(password_candidate);
     let users = _app.get_users();
     let debug = _app.get_config().debug;
     if (debug)
@@ -51,5 +83,6 @@ module.exports = {
     "init": init,
     "hash": hash,
     "generate_token": generate_token,
+    "validate_password": validate_password,
     "validate_credentials": validate_credentials,
 }

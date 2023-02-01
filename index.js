@@ -6,7 +6,7 @@ const app = express();
 const server = require('http').createServer(app);
 
 const session = require('express-session');
-const MemoryStore = require('memorystore')(session);
+const memory_store = require('memorystore')(session);
 
 const sa_app = require("./private/js/app.js");
 const { read_configuration } = require('./private/js/tools.js');
@@ -30,7 +30,7 @@ let session_conf = {
         maxAge: config.cookies.max_days * 24 * 3600 * 1000, // Cookie validity in milliseconds
         httpOnly: true
     },
-    store: new MemoryStore({
+    store: new memory_store({
         checkPeriod: 1 * 24 * 3600 * 1000 // prune expired entries every 24h
     }),
 };
