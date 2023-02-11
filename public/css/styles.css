@@ -16,3 +16,8 @@
     border: 6px solid transparent;
     background-clip: content-box;
 }
+
+.linefeed-text
+{
+    white-space: pre-line;
+}

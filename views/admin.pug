@@ -49,11 +49,12 @@ block content
                     .row
                         .col-lg-6.col-md-12
                             h5 User information
-                            input#user-modal-username.form-control.mb-3(type="text" placeholder="Username")
-                            input#user-modal-password.form-control.mb-3(type="password" placeholder="Password")
+                            input#user-modal-username.form-control.mb-3(type="text" placeholder="Username", aria-describedby="user-modal-validation")
+                            input#user-modal-password.form-control.mb-3(type="password" placeholder="Password", aria-describedby="user-modal-validation")
                             .form-check
                                 input#user-modal-is-admin.form-check-input(type="checkbox")
                                 label.form-check-label(for="user-modal-is-admin") Admin
+                            div#user-modal-validation.invalid-feedback.linefeed-text
                         .col-lg-6.col-md-12
                             .row
                                 .col
@@ -71,8 +72,10 @@ block content
                 .modal-header
                     h5#service-modal-title
                 .modal-body
-                    input#service-modal-name.form-control.mb-3(type="text" placeholder="Service name")
-                    input#service-modal-url.form-control(type="text" placeholder="Address")
+                    .div.mb-12
+                        input#service-modal-name.form-control.mb-3(type="text" placeholder="Service name", aria-describedby="service-modal-validation")
+                        input#service-modal-url.form-control(type="text" placeholder="Address", aria-describedby="service-modal-validation")
+                        div#service-modal-validation.invalid-feedback
                 .modal-footer
                     button#service-modal-cancel-btn.btn.btn-secondary(type="button" data-bs-dismiss="modal") Cancel
                     button#service-modal-save-btn.btn.btn-primary(type="button") Save

@@ -148,6 +148,13 @@ function load_service_table(services)
     }
 }
 
+function user_modal_clear_validation()
+{
+    _user_modal.dom.validation.innerHTML = "";
+    _user_modal.dom.username.classList.remove("is-invalid");
+    _user_modal.dom.password.classList.remove("is-invalid");
+}
+
 function user_modal_reset()
 {
     console.log("User modal reset");
@@ -159,6 +166,8 @@ function user_modal_reset()
     _user_modal.dom.is_admin.checked = false;
     _user_modal.dom.all_permission.checked = false;
     remove_dom_node_children(_user_modal.dom.permissions);
+
+    user_modal_clear_validation();
 }
 
 function user_modal_set(user)
@@ -201,6 +210,9 @@ function user_modal_save()
     else
         var username = _user_modal.dom.title.textContent;
 
+
+    user_modal_clear_validation();
+
     ajax_method(
         "/api/users/" + username,
         user,
@@ -217,7 +229,23 @@ function user_modal_save_success()
 
 function user_modal_save_error(err)
 {
-    console.error(err);
+    var data = JSON.parse(err);
+    _user_modal.dom.validation.innerHTML = data.error;
+    if (data.code < 3 || data.code == 7)
+    {
+        _user_modal.dom.password.classList.add("is-invalid");
+    }
+    else
+    {
+        _user_modal.dom.username.classList.add("is-invalid");
+    }
+}
+
+function service_modal_clear_validation()
+{
+    _service_modal.dom.validation.innerHTML = "";
+    _service_modal.dom.name.classList.remove("is-invalid");
+    _service_modal.dom.url.classList.remove("is-invalid");
 }
 
 function service_modal_reset()
@@ -228,6 +256,7 @@ function service_modal_reset()
     _service_modal.new = false;
     _service_modal.dom.name.value = "";
     _service_modal.dom.url.value = "";
+    service_modal_clear_validation();
 }
 
 function service_modal_set(name, url)
@@ -259,6 +288,8 @@ function service_modal_save()
     else
         var service_name = _service_modal.dom.title.textContent;
 
+    service_modal_clear_validation();
+
     ajax_method(
         "/api/services/" + service_name,
         service,
@@ -275,7 +306,10 @@ function service_modal_save_success()
 
 function service_modal_save_error(err)
 {
-    console.error(err);
+    var data = JSON.parse(err);
+    _service_modal.dom.validation.innerHTML = data.error;
+    _service_modal.dom.name.classList.add("is-invalid");
+    // no error code on url yet
 }
 
 document.addEventListener("DOMContentLoaded", function(event)
@@ -293,6 +327,7 @@ document.addEventListener("DOMContentLoaded", function(event)
     _user_modal.dom.password = get_dom_node_by_id("user-modal-password");
     _user_modal.dom.is_admin = get_dom_node_by_id("user-modal-is-admin");
     _user_modal.dom.permissions = get_dom_node_by_id("user-modal-permissions");
+    _user_modal.dom.validation = get_dom_node_by_id("user-modal-validation");
 
     _user_modal.dom.all_permission = get_dom_node_by_id("user-modal-all-permission");
     _user_modal.dom.all_permission.addEventListener("change", () => {
@@ -331,6 +366,7 @@ document.addEventListener("DOMContentLoaded", function(event)
     _service_modal.dom.title = get_dom_node_by_id("service-modal-title");
     _service_modal.dom.name = get_dom_node_by_id("service-modal-name");
     _service_modal.dom.url = get_dom_node_by_id("service-modal-url");
+    _service_modal.dom.validation = get_dom_node_by_id("service-modal-validation");
 
     _service_modal.dom.save_btn = get_dom_node_by_id("service-modal-save-btn");
     _service_modal.dom.save_btn.addEventListener("click", service_modal_save);

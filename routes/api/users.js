@@ -45,7 +45,7 @@ module.exports = function(sa_app)
         if (ret.good)
             res.status(200).send("Done");
         else
-            res.status(400).send(ret.error);
+            res.status(400).send(ret);
     });
 
     router.put("/:username", (req, res) => {
@@ -53,7 +53,7 @@ module.exports = function(sa_app)
         if (ret.good)
             res.status(200).send("Done");
         else
-            res.status(400).send(ret.error);
+            res.status(400).send(ret);
     });
 
     router.delete("/:username", (req, res) => {
@@ -68,7 +68,7 @@ module.exports = function(sa_app)
         if (ret.good)
             res.status(200).send("Done");
         else
-            res.status(400).send(ret.error);
+            res.status(400).send(ret);
     });
 
     router.put("/:username/password", (req, res) => {
@@ -94,7 +94,7 @@ module.exports = function(sa_app)
         if (ret.good)
             res.status(200).send("Done");
         else
-            res.status(400).send(ret.error);
+            res.status(400).send(ret);
     });
 
     return router;

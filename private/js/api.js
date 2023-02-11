@@ -60,7 +60,6 @@ function set_user(username, user_conf, overwrite = true)
     let new_name = user_conf.name;
 
     // error code starts at 3 because of passwords error codes
-
     if (_check_is_string(username) == false)
         return _app.tools.result(false, "User name is not a string", 3);
     if (_check_is_string(new_name) == false)
@@ -84,6 +83,7 @@ function set_user(username, user_conf, overwrite = true)
 
     if (user_conf.password)
     {
+        // send error codes
         let password_check = _verif_password(user_conf.password);
         if (!password_check.good)
             return password_check;
