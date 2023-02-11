@@ -312,75 +312,6 @@ function service_modal_save_error(err)
     // no error code on url yet
 }
 
-document.addEventListener("DOMContentLoaded", function(event)
-{
-    load_users_and_services();
-
-    // User modal
-    // We use a tmp variale here to avoid overwriting
-    // modal attributes with get_dom_node_by_id
-    let user_modal_tmp = get_dom_node_by_id("user-modal");
-    user_modal_tmp.addEventListener("hidden.bs.modal", user_modal_reset);
-
-    _user_modal.dom.title = get_dom_node_by_id("user-modal-title");
-    _user_modal.dom.username = get_dom_node_by_id("user-modal-username");
-    _user_modal.dom.password = get_dom_node_by_id("user-modal-password");
-    _user_modal.dom.is_admin = get_dom_node_by_id("user-modal-is-admin");
-    _user_modal.dom.permissions = get_dom_node_by_id("user-modal-permissions");
-    _user_modal.dom.validation = get_dom_node_by_id("user-modal-validation");
-
-    _user_modal.dom.all_permission = get_dom_node_by_id("user-modal-all-permission");
-    _user_modal.dom.all_permission.addEventListener("change", () => {
-        let items = _user_modal.dom.permissions.children[0].children;
-        for (let item of items)
-        {
-            if (_user_modal.dom.all_permission.checked)
-                item.classList.add("disabled");
-            else
-                item.classList.remove("disabled");
-
-            let check = item.getElementsByTagName("input")[0];
-            check.checked = false;
-        }
-    });
-
-    _user_modal.dom.save_btn = get_dom_node_by_id("user-modal-save-btn");
-    _user_modal.dom.save_btn.addEventListener("click", user_modal_save);
-
-    let add_user_btn = get_dom_node_by_id("add-user-btn");
-    add_user_btn.addEventListener("click", () => {
-        console.log("New user");
-        _user_modal.dom.title.textContent = "New user";
-        _user_modal.new = true;
-
-        let perms_list = user_modal_make_permissions_list(_services);
-        _user_modal.dom.permissions.appendChild(perms_list);
-    });
-
-    _user_modal.bs = new bootstrap.Modal("#user-modal");
-
-    // Service modal
-    let service_modal_tmp = get_dom_node_by_id("service-modal");
-    service_modal_tmp.addEventListener("hidden.bs.modal", service_modal_reset);
-
-    _service_modal.dom.title = get_dom_node_by_id("service-modal-title");
-    _service_modal.dom.name = get_dom_node_by_id("service-modal-name");
-    _service_modal.dom.url = get_dom_node_by_id("service-modal-url");
-    _service_modal.dom.validation = get_dom_node_by_id("service-modal-validation");
-
-    _service_modal.dom.save_btn = get_dom_node_by_id("service-modal-save-btn");
-    _service_modal.dom.save_btn.addEventListener("click", service_modal_save);
-
-    let add_service_btn = get_dom_node_by_id("add-service-btn");
-    add_service_btn.addEventListener("click", () => {
-        console.log("New service");
-        _service_modal.dom.title.textContent = "New service";
-        _service_modal.new = true;
-    });
-
-    _service_modal.bs = new bootstrap.Modal("#service-modal");
-});
-
 function user_table_new_row(user)
 {
     let new_row = document.createElement("tr");
@@ -529,3 +460,103 @@ function user_modal_get_permissions_list()
     }
     return ret;
 }
+
+function is_user_modal_opened()
+{
+    return _user_modal.bs._isShown;
+}
+
+function is_service_modal_opened()
+{
+    return _service_modal.bs._isShown;
+}
+
+function on_key_press_enter()
+{
+    if (is_user_modal_opened())
+    {
+        _user_modal.dom.save_btn.click();
+    }
+    else if (is_service_modal_opened())
+    {
+        _service_modal.dom.save_btn.click();
+    }
+}
+
+document.addEventListener("DOMContentLoaded", function(event)
+{
+    load_users_and_services();
+
+    // User modal
+    // We use a tmp variale here to avoid overwriting
+    // modal attributes with get_dom_node_by_id
+    let user_modal_tmp = get_dom_node_by_id("user-modal");
+    user_modal_tmp.addEventListener("hidden.bs.modal", user_modal_reset);
+
+    _user_modal.dom.title = get_dom_node_by_id("user-modal-title");
+    _user_modal.dom.username = get_dom_node_by_id("user-modal-username");
+    _user_modal.dom.password = get_dom_node_by_id("user-modal-password");
+    _user_modal.dom.is_admin = get_dom_node_by_id("user-modal-is-admin");
+    _user_modal.dom.permissions = get_dom_node_by_id("user-modal-permissions");
+    _user_modal.dom.validation = get_dom_node_by_id("user-modal-validation");
+
+    _user_modal.dom.all_permission = get_dom_node_by_id("user-modal-all-permission");
+    _user_modal.dom.all_permission.addEventListener("change", () => {
+        let items = _user_modal.dom.permissions.children[0].children;
+        for (let item of items)
+        {
+            if (_user_modal.dom.all_permission.checked)
+                item.classList.add("disabled");
+            else
+                item.classList.remove("disabled");
+
+            let check = item.getElementsByTagName("input")[0];
+            check.checked = false;
+        }
+    });
+
+    _user_modal.dom.save_btn = get_dom_node_by_id("user-modal-save-btn");
+    _user_modal.dom.save_btn.addEventListener("click", user_modal_save);
+
+    let add_user_btn = get_dom_node_by_id("add-user-btn");
+    add_user_btn.addEventListener("click", () => {
+        console.log("New user");
+        _user_modal.dom.title.textContent = "New user";
+        _user_modal.new = true;
+
+        let perms_list = user_modal_make_permissions_list(_services);
+        _user_modal.dom.permissions.appendChild(perms_list);
+    });
+
+    _user_modal.bs = new bootstrap.Modal("#user-modal");
+
+    // Service modal
+    let service_modal_tmp = get_dom_node_by_id("service-modal");
+    service_modal_tmp.addEventListener("hidden.bs.modal", service_modal_reset);
+
+    _service_modal.dom.title = get_dom_node_by_id("service-modal-title");
+    _service_modal.dom.name = get_dom_node_by_id("service-modal-name");
+    _service_modal.dom.url = get_dom_node_by_id("service-modal-url");
+    _service_modal.dom.validation = get_dom_node_by_id("service-modal-validation");
+
+    _service_modal.dom.save_btn = get_dom_node_by_id("service-modal-save-btn");
+    _service_modal.dom.save_btn.addEventListener("click", service_modal_save);
+
+    let add_service_btn = get_dom_node_by_id("add-service-btn");
+    add_service_btn.addEventListener("click", () => {
+        console.log("New service");
+        _service_modal.dom.title.textContent = "New service";
+        _service_modal.new = true;
+    });
+
+    _service_modal.bs = new bootstrap.Modal("#service-modal");
+
+    document.addEventListener("keypress", function(event)
+    {
+        if (event.key === "Enter")
+        {
+            event.preventDefault();
+            on_key_press_enter();
+        }
+    });
+});
